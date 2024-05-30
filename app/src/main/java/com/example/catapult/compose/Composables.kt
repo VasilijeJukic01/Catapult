@@ -24,7 +24,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.catapult.model.catalog.Breed
+import com.example.catapult.model.catalog.ViewBreed
 import com.example.catapult.repo.DataSample
 import com.example.catapult.ui.theme.CatalogTheme
 import com.example.catapult.ui.theme.cardColor
@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.*
 
 @Composable
 fun BreedCard(
-    breed: Breed,
+    viewBreed: ViewBreed,
     onClick: () -> Unit
 ) {
     ElevatedCard(
@@ -50,7 +50,7 @@ fun BreedCard(
         // Name
         Row {
             Text(
-                text = breed.name,
+                text = viewBreed.name,
                 modifier = Modifier
                     .padding()
                     .padding(10.dp),
@@ -70,7 +70,7 @@ fun BreedCard(
                 text = buildAnnotatedString {
                     append("Also known as: ")
                     withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                        append(breed.altNames.joinToString(", "))
+                        append(viewBreed.altNames.joinToString(", "))
                     }
                 }
             )
@@ -83,10 +83,10 @@ fun BreedCard(
                     .padding(horizontal = 10.dp)
                     .weight(weight = 1f),
                 fontSize = 12.sp,
-                text = if (breed.description.length > 250) {
-                    "${breed.description.take(250)}..."
+                text = if (viewBreed.description.length > 250) {
+                    "${viewBreed.description.take(250)}..."
                 } else {
-                    breed.description
+                    viewBreed.description
                 },
                 lineHeight = 16.sp
             )
@@ -94,7 +94,7 @@ fun BreedCard(
 
         // Temperament
         Row {
-            breed.temperament.take(3).forEach { temperament ->
+            viewBreed.temperament.take(3).forEach { temperament ->
                 SuggestionChip(
                     onClick = {},
                     modifier = Modifier.padding(4.dp),
@@ -140,7 +140,7 @@ fun NoDataContent(
 fun PreviewBreedCard() {
     CatalogTheme {
         BreedCard(
-            breed = DataSample[0],
+            viewBreed = DataSample[0],
             onClick = {},
         )
     }

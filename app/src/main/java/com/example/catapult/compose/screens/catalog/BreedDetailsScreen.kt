@@ -35,7 +35,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.SubcomposeAsyncImage
 import com.example.catapult.compose.NoDataContent
-import com.example.catapult.model.catalog.Breed
+import com.example.catapult.model.catalog.ViewBreed
 import com.example.catapult.model.catalog.Characteristics
 import com.example.catapult.model.catalog.details.BreedDetailsState
 import com.example.catapult.model.catalog.details.BreedDetailsViewModel
@@ -109,7 +109,7 @@ fun BreedDetailsScreen(
 
 @Composable
 fun BreedDataLazyColumn(
-    data: Breed,
+    data: ViewBreed,
 ) {
 
     val openUrlLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -312,7 +312,7 @@ fun PreviewDetailsScreen() {
         BreedDetailsScreen(
             state = BreedDetailsState(
                 breedId = "1",
-                data = Breed(
+                data = ViewBreed(
                     id = "2",
                     name = "Siamese",
                     altNames = listOf("Siam"),

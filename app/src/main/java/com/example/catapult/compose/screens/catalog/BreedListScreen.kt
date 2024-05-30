@@ -25,7 +25,7 @@ import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.example.catapult.R
 import com.example.catapult.compose.*
-import com.example.catapult.model.catalog.Breed
+import com.example.catapult.model.catalog.ViewBreed
 import com.example.catapult.model.catalog.list.BreedListState
 import com.example.catapult.model.catalog.list.BreedListUiEvent
 import com.example.catapult.model.catalog.list.BreedListViewModel
@@ -37,7 +37,7 @@ import com.example.catapult.ui.theme.*
 fun BreedListScreen(
     state : BreedListState,
     eventPublisher: (BreedListUiEvent) -> Unit,
-    onClick: (Breed) -> Unit
+    onClick: (ViewBreed) -> Unit
 ) {
     val logo: Painter = painterResource(id = R.drawable.logo_vector)
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -55,7 +55,7 @@ fun BreedListScreen(
         },
         content = {
             BreedList(
-                items = state.currentBreeds,
+                items = state.currentViewBreeds,
                 padding = it,
                 onClick = onClick
             )
@@ -123,9 +123,9 @@ private fun CustomTopBar(
 
 @Composable
 private fun BreedList(
-    items: List<Breed>,
+    items: List<ViewBreed>,
     padding: PaddingValues,
-    onClick: (Breed) -> Unit
+    onClick: (ViewBreed) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier
@@ -138,7 +138,7 @@ private fun BreedList(
         }
         items(items) { breed ->
             BreedCard(
-                breed = breed,
+                viewBreed = breed,
                 onClick = { onClick(breed) },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -148,7 +148,7 @@ private fun BreedList(
 
 @Composable
 private fun DisplayEmptyStateOrError(state: BreedListState) {
-    if (state.currentBreeds.isEmpty()) {
+    if (state.currentViewBreeds.isEmpty()) {
         when (state.fetching) {
             true -> {
                 Box(
@@ -202,7 +202,7 @@ fun NavGraphBuilder.breedsListScreen(
 fun PreviewCatListScreen() {
     CatalogTheme {
         BreedListScreen(
-            state = BreedListState(breeds = DataSample),
+            state = BreedListState(viewBreeds = DataSample),
             eventPublisher = {},
             onClick = {},
         )

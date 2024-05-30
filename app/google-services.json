@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "32736651654",
+    "project_id": "catapult-d53c6",
+    "storage_bucket": "catapult-d53c6.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:32736651654:android:5b3144584e14bd924ea407",
+        "android_client_info": {
+          "package_name": "com.example.catapult"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCZ2ayvUw_hyIS8Sp0d6JWb80nOCi-rr2E"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -2,7 +2,6 @@ package com.example.catapult.model.catalog.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.model.catalog.BreedMapper
 import com.example.catapult.repo.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -22,7 +21,6 @@ StateFlow - Hot Flow that represents a state. It emits the current state to new 
  */
 
 class BreedListViewModel (
-    private val breedMapper: BreedMapper = BreedMapper,
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
@@ -68,9 +66,9 @@ class BreedListViewModel (
     // Event handlers
     private fun handleSearch() {
         val filter = stateFlow.value.filter
-        val breeds = stateFlow.value.breeds
+        val breeds = stateFlow.value.viewBreeds
         val filtered = breeds.filter { it.name.contains(filter, ignoreCase = true) }
-        setState { copy(currentBreeds = filtered) }
+        setState { copy(currentViewBreeds = filtered) }
     }
 
     // Fetching
@@ -80,11 +78,14 @@ class BreedListViewModel (
             try {
                 withContext(Dispatchers.IO) {
                     repository.fetchAllBreeds()
+                    val allBreeds = repository.allBreeds()
+                    withContext(Dispatchers.Main) {
+                        setState { copy(
+                            viewBreeds = allBreeds,
+                            currentViewBreeds = allBreeds
+                        ) }
+                    }
                     println("Fetched breeds")
-                }
-                setState { copy(
-                    breeds = repository.allBreeds().map { breedMapper.mapToBreed(it) },
-                    currentBreeds = repository.allBreeds().map { breedMapper.mapToBreed(it) })
                 }
             } catch (error: Exception) {
                 setState { copy(error = BreedListState.BreedListError.BreedListUpdateFailed(cause = error)) }

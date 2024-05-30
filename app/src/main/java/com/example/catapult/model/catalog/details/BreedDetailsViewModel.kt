@@ -2,7 +2,6 @@ package com.example.catapult.model.catalog.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.model.catalog.BreedMapper
 import com.example.catapult.repo.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,7 +12,6 @@ import kotlinx.coroutines.withContext
 
 class BreedDetailsViewModel (
     private val breedId: String,
-    private val breedMapper: BreedMapper = BreedMapper,
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
@@ -34,7 +32,7 @@ class BreedDetailsViewModel (
             try {
                 withContext(Dispatchers.IO) {
                     val breed = repository.fetchBreedDetails(breedId)
-                    setState { copy(data = breed?.let { breedMapper.mapToBreed(it) }) }
+                    setState { copy(data = breed) }
                 }
             } catch (e: Exception) {
                 setState {
