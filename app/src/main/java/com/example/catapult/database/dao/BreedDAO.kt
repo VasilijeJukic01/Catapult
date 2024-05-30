@@ -13,6 +13,9 @@ interface BreedDAO {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(list: List<Breed>)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insert(breed: Breed)
+
     @Query("SELECT * FROM Breed")
     fun getAll(): List<Breed>
 

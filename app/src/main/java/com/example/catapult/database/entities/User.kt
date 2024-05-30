@@ -16,10 +16,11 @@ data class User (
     init {
         val emailRegex = "^[A-Za-z](.*)([@]{1})(.{1,})(\\.)(.{1,})".toRegex()
         require(email.matches(emailRegex)) { "Invalid email format" }
-        require(email.isNotBlank()) { "Email cannot be blank or empty" }
         require(firstName.isNotBlank()) { "First name cannot be blank or empty" }
         require(lastName.isNotBlank()) { "Last name cannot be blank or empty" }
-        require(nickname.isNotBlank()) { "Nickname cannot be blank or empty" }
+
+        val nicknameRegex = "^[A-Za-z0-9_]+$".toRegex()
+        require(nickname.matches(nicknameRegex)) { "Invalid nickname format" }
     }
 
     val fullName: String
