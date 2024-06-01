@@ -1,4 +1,4 @@
-package com.example.catapult.api
+package com.example.catapult.api.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

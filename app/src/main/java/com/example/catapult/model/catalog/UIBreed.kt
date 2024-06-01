@@ -1,6 +1,6 @@
 package com.example.catapult.model.catalog
 
-data class Breed(
+data class UIBreed(
     val id: String,
     val name: String,
     val altNames: List<String>,

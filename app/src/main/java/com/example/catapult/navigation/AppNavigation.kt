@@ -1,10 +1,14 @@
 package com.example.catapult.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.rememberNavController
-import com.example.catapult.compose.screens.catalog.breedDetailsScreen
-import com.example.catapult.compose.screens.catalog.breedsListScreen
+import androidx.navigation.navArgument
+import com.example.catapult.ui.compose.breedDetailsScreen
+import com.example.catapult.ui.compose.breedsListScreen
+import com.example.catapult.ui.compose.breedGalleryScreen
+import com.example.catapult.ui.compose.breedImagesGrid
 
 @Composable
 fun AppNavigation() {
@@ -23,6 +27,31 @@ fun AppNavigation() {
         breedDetailsScreen(
             route = "breeds/{id}",
             navController = navController,
+        )
+        breedImagesGrid(
+            route = "breeds/grid/{breedId}",
+            navController = navController,
+            arguments = listOf(
+                navArgument(name = "breedId") {
+                    nullable = false
+                    type = NavType.StringType
+                }
+            ),
+            onClose = { navController.navigateUp() }
+        )
+        breedGalleryScreen(
+            route = "breeds/gallery/{breedId}?currentImage={currentImage}",
+            arguments = listOf(
+                navArgument(name = "breedId") {
+                    nullable = false
+                    type = NavType.StringType
+                },
+                navArgument(name = "currentImage") {
+                    nullable = false
+                    type = NavType.StringType
+                }
+            ),
+            onClose = { navController.navigateUp() }
         )
     }
 

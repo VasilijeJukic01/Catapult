@@ -6,6 +6,4 @@ data class Characteristics (
     val energyLevel: Int,
     val intelligence: Int,
     val strangerFriendly: Int,
-) {
-
-}
+)
