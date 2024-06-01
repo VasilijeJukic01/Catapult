@@ -1,10 +1,10 @@
-package com.example.catapult.repo
+package com.example.catapult.dummies
 
-import com.example.catapult.model.catalog.ViewBreed
+import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.Characteristics
 
 val DataSample = listOf(
-    ViewBreed(
+    UIBreed(
         id = "1",
         name = "Maine Coon",
         altNames = listOf("Coon Cat", "Maine Cat"),
@@ -24,7 +24,7 @@ val DataSample = listOf(
         wikipediaUrl = "https://en.wikipedia.org/wiki/Maine_Coon",
         imageUrl = ""
     ),
-    ViewBreed(
+    UIBreed(
         id = "2",
         name = "Siamese",
         altNames = listOf("Siam"),

@@ -1,6 +1,6 @@
 package com.example.catapult.model.catalog
 
-data class ViewBreedImage(
+data class UIBreedImage(
     val id: String,
     val breedId: String,
     val url: String,

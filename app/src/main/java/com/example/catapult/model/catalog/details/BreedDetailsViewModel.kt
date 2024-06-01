@@ -2,7 +2,7 @@ package com.example.catapult.model.catalog.details
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.repo.BreedRepository
+import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow

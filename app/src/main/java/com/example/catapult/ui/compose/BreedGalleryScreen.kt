@@ -1,4 +1,4 @@
-package com.example.catapult.model.catalog.gallery
+package com.example.catapult.ui.compose
 
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -24,9 +24,10 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.catapult.compose.AppIconButton
-import com.example.catapult.compose.ImagePreview
+import com.example.catapult.model.catalog.gallery.BreedGalleryContract
+import com.example.catapult.model.catalog.gallery.BreedGalleryViewModel
 
+// Navigation
 fun NavGraphBuilder.breedGalleryScreen(
     route: String,
     arguments: List<NamedNavArgument>,
@@ -66,9 +67,7 @@ fun BreedGalleryScreen(
     onClose: () -> Unit,
 ) {
     val pagerState = rememberPagerState(
-        pageCount = {
-            state.images.size
-        }
+        pageCount = { state.images.size }
     )
 
     LaunchedEffect(state.images, state.currentIndex) {

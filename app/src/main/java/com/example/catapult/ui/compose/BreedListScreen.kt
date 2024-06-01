@@ -1,4 +1,4 @@
-package com.example.catapult.compose.screens.catalog
+package com.example.catapult.ui.compose
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -24,12 +24,11 @@ import androidx.lifecycle.viewmodel.compose.*
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.example.catapult.R
-import com.example.catapult.compose.*
-import com.example.catapult.model.catalog.ViewBreed
-import com.example.catapult.model.catalog.list.BreedListState
-import com.example.catapult.model.catalog.list.BreedListUiEvent
+import com.example.catapult.dummies.DataSample
+import com.example.catapult.model.catalog.UIBreed
+import com.example.catapult.model.catalog.list.BreedListContract.BreedListState
+import com.example.catapult.model.catalog.list.BreedListContract.BreedListUiEvent
 import com.example.catapult.model.catalog.list.BreedListViewModel
-import com.example.catapult.repo.*
 import com.example.catapult.ui.theme.*
 
 @ExperimentalMaterial3Api
@@ -37,7 +36,7 @@ import com.example.catapult.ui.theme.*
 fun BreedListScreen(
     state : BreedListState,
     eventPublisher: (BreedListUiEvent) -> Unit,
-    onClick: (ViewBreed) -> Unit
+    onClick: (UIBreed) -> Unit
 ) {
     val logo: Painter = painterResource(id = R.drawable.logo_vector)
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -55,7 +54,7 @@ fun BreedListScreen(
         },
         content = {
             BreedList(
-                items = state.currentViewBreeds,
+                items = state.currentUIBreeds,
                 padding = it,
                 onClick = onClick
             )
@@ -123,9 +122,9 @@ private fun CustomTopBar(
 
 @Composable
 private fun BreedList(
-    items: List<ViewBreed>,
+    items: List<UIBreed>,
     padding: PaddingValues,
-    onClick: (ViewBreed) -> Unit
+    onClick: (UIBreed) -> Unit
 ) {
     LazyColumn (
         modifier = Modifier
@@ -138,7 +137,7 @@ private fun BreedList(
         }
         items(items) { breed ->
             BreedCard(
-                viewBreed = breed,
+                uiBreed = breed,
                 onClick = { onClick(breed) },
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -148,7 +147,7 @@ private fun BreedList(
 
 @Composable
 private fun DisplayEmptyStateOrError(state: BreedListState) {
-    if (state.currentViewBreeds.isEmpty()) {
+    if (state.currentUIBreeds.isEmpty()) {
         when (state.fetching) {
             true -> {
                 Box(
@@ -202,7 +201,7 @@ fun NavGraphBuilder.breedsListScreen(
 fun PreviewCatListScreen() {
     CatalogTheme {
         BreedListScreen(
-            state = BreedListState(viewBreeds = DataSample),
+            state = BreedListState(UIBreeds = DataSample),
             eventPublisher = {},
             onClick = {},
         )

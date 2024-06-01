@@ -1,4 +1,4 @@
-package com.example.catapult.compose.screens.catalog
+package com.example.catapult.ui.compose
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -25,6 +25,7 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -33,8 +34,8 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.SubcomposeAsyncImage
-import com.example.catapult.compose.NoDataContent
-import com.example.catapult.model.catalog.ViewBreed
+import com.example.catapult.model.catalog.Characteristics
+import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.details.BreedDetailsState
 import com.example.catapult.model.catalog.details.BreedDetailsViewModel
 import com.example.catapult.ui.theme.topBarColor
@@ -78,6 +79,7 @@ fun BreedDetailsScreen(
 
             Spacer(modifier = Modifier.height(16.dp))
 
+            // State handling
             when {
                 (state.fetching) -> {
                     LinearProgressIndicator(
@@ -109,7 +111,7 @@ fun BreedDetailsScreen(
 
 @Composable
 fun BreedDataLazyColumn(
-    data: ViewBreed,
+    data: UIBreed,
     navController: NavController
 ) {
 
@@ -259,6 +261,8 @@ fun BreedDataLazyColumn(
             ) {
                 Text("Open Wikipedia Page")
             }
+
+            // View Images
             Button(
                 onClick = {
                     navController.navigate("breeds/grid/${data.id}")
@@ -317,7 +321,7 @@ fun NavGraphBuilder.breedDetailsScreen(
         navController = navController
     )
 }
-/*
+
 // Preview
 @Preview
 @Composable
@@ -326,7 +330,7 @@ fun PreviewDetailsScreen() {
         BreedDetailsScreen(
             state = BreedDetailsState(
                 breedId = "1",
-                data = ViewBreed(
+                data = UIBreed(
                     id = "2",
                     name = "Siamese",
                     altNames = listOf("Siam"),
@@ -348,8 +352,8 @@ fun PreviewDetailsScreen() {
                 ),
             ),
             onBackClick = {},
-            navController
+            navController = NavController(LocalContext.current)
         )
     }
 
-}*/
+}

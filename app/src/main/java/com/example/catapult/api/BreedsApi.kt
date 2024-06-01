@@ -1,5 +1,7 @@
 package com.example.catapult.api
 
+import com.example.catapult.api.models.BreedApiModel
+import com.example.catapult.api.models.BreedImageApiModel
 import retrofit2.http.GET
 import retrofit2.http.Path
 import retrofit2.http.Query

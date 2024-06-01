@@ -1,4 +1,4 @@
-package com.example.catapult.compose
+package com.example.catapult.ui.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,17 +31,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
-import com.example.catapult.model.catalog.ViewBreed
-import com.example.catapult.repo.DataSample
+import com.example.catapult.model.catalog.UIBreed
+import com.example.catapult.dummies.DataSample
 import com.example.catapult.ui.theme.CatalogTheme
 import com.example.catapult.ui.theme.cardColor
 import androidx.compose.ui.unit.*
 import coil.compose.SubcomposeAsyncImage
-import com.example.catapult.model.catalog.ViewBreedImage
+import com.example.catapult.model.catalog.UIBreedImage
 
 @Composable
 fun BreedCard(
-    viewBreed: ViewBreed,
+    uiBreed: UIBreed,
     onClick: () -> Unit
 ) {
     ElevatedCard(
@@ -59,7 +59,7 @@ fun BreedCard(
         // Name
         Row {
             Text(
-                text = viewBreed.name,
+                text = uiBreed.name,
                 modifier = Modifier
                     .padding()
                     .padding(10.dp),
@@ -79,7 +79,7 @@ fun BreedCard(
                 text = buildAnnotatedString {
                     append("Also known as: ")
                     withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                        append(viewBreed.altNames.joinToString(", "))
+                        append(uiBreed.altNames.joinToString(", "))
                     }
                 }
             )
@@ -92,10 +92,10 @@ fun BreedCard(
                     .padding(horizontal = 10.dp)
                     .weight(weight = 1f),
                 fontSize = 12.sp,
-                text = if (viewBreed.description.length > 250) {
-                    "${viewBreed.description.take(250)}..."
+                text = if (uiBreed.description.length > 250) {
+                    "${uiBreed.description.take(250)}..."
                 } else {
-                    viewBreed.description
+                    uiBreed.description
                 },
                 lineHeight = 16.sp
             )
@@ -103,7 +103,7 @@ fun BreedCard(
 
         // Temperament
         Row {
-            viewBreed.temperament.take(3).forEach { temperament ->
+            uiBreed.temperament.take(3).forEach { temperament ->
                 SuggestionChip(
                     onClick = {},
                     modifier = Modifier.padding(4.dp),
@@ -146,7 +146,7 @@ fun NoDataContent(
 @Composable
 fun ImagePreview(
     modifier: Modifier,
-    image: ViewBreedImage,
+    image: UIBreedImage,
 ) {
     Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
         SubcomposeAsyncImage(
@@ -161,7 +161,6 @@ fun ImagePreview(
                         modifier = Modifier.size(36.dp),
                     )
                 }
-
             },
             contentDescription = null,
             contentScale = ContentScale.FillWidth,
@@ -175,7 +174,7 @@ fun ImagePreview(
 fun PreviewBreedCard() {
     CatalogTheme {
         BreedCard(
-            viewBreed = DataSample[0],
+            uiBreed = DataSample[0],
             onClick = {},
         )
     }

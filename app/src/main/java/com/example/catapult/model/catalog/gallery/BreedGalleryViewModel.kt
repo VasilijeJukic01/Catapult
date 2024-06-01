@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.mappers.asViewBreedImage
-import com.example.catapult.repo.BreedRepository
+import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -18,25 +18,28 @@ class BreedGalleryViewModel (
     private val breedRepository: BreedRepository = BreedRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(BreedGalleryContract.BreedGalleryUiState())
-    val state = _state.asStateFlow()
+    // State
+    private val stateFlow = MutableStateFlow(BreedGalleryContract.BreedGalleryUiState())
+    val state = stateFlow.asStateFlow()
+
     private fun setState(reducer: BreedGalleryContract.BreedGalleryUiState.() -> BreedGalleryContract.BreedGalleryUiState) =
-        _state.update(reducer)
+        stateFlow.update(reducer)
 
     init {
         fetchImages()
     }
 
+    // Fetching
     private fun fetchImages() {
         viewModelScope.launch {
             setState { copy(loading = true) }
             try {
                 val images = withContext(Dispatchers.IO) {
-                    breedRepository.getAllImagesForBreed(breedId = breedId)
+                    breedRepository.allImagesForBreed(breedId = breedId)
                 }
                 val imagesView = images.map { it.asViewBreedImage() }
                 val currentIndex = imagesView.indexOfFirst { it.id == currentImage }
-                Log.d("BreedGalleryViewModel", "Fetched ${images.size} images for breed $breedId with current image $currentImage at index $currentIndex")
+
                 setState { copy(images = imagesView, currentIndex = currentIndex) }
             } catch (error: Exception) {
                 Log.e("BreedGalleryViewModel", "Failed to fetch images for breed $breedId, error: ${error.message}")

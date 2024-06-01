@@ -2,7 +2,7 @@ package com.example.catapult.model.catalog.list
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.repo.BreedRepository
+import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.catapult.model.catalog.list.BreedListContract.BreedListState
+import com.example.catapult.model.catalog.list.BreedListContract.BreedListUiEvent
 
 /*
 Hot Flow - Type of flow that is active independently of the presence of collectors.
@@ -66,9 +68,9 @@ class BreedListViewModel (
     // Event handlers
     private fun handleSearch() {
         val filter = stateFlow.value.filter
-        val breeds = stateFlow.value.viewBreeds
+        val breeds = stateFlow.value.UIBreeds
         val filtered = breeds.filter { it.name.contains(filter, ignoreCase = true) }
-        setState { copy(currentViewBreeds = filtered) }
+        setState { copy(currentUIBreeds = filtered) }
     }
 
     // Fetching
@@ -81,8 +83,8 @@ class BreedListViewModel (
                     val allBreeds = repository.allBreeds()
                     withContext(Dispatchers.Main) {
                         setState { copy(
-                            viewBreeds = allBreeds,
-                            currentViewBreeds = allBreeds
+                            UIBreeds = allBreeds,
+                            currentUIBreeds = allBreeds
                         ) }
                     }
                     println("Fetched breeds")

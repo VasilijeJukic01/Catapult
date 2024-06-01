@@ -1,6 +1,5 @@
-package com.example.catapult.model.catalog.grid
+package com.example.catapult.ui.compose
 
-import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -29,19 +28,17 @@ import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.catapult.compose.AppIconButton
-import com.example.catapult.compose.ImagePreview
-import com.example.catapult.model.catalog.ViewBreedImage
+import com.example.catapult.model.catalog.UIBreedImage
+import com.example.catapult.model.catalog.grid.BreedGridContract
+import com.example.catapult.model.catalog.grid.BreedGridViewModel
 
+// Navigation
 fun NavGraphBuilder.breedImagesGrid(
     route: String,
     arguments: List<NamedNavArgument>,
     navController: NavController,
     onClose: () -> Unit,
-) = composable(
-    route = route,
-    arguments = arguments,
-) { navBackStackEntry ->
+) = composable(route = route, arguments = arguments) { navBackStackEntry ->
     val breedId = navBackStackEntry.arguments?.getString("breedId")
         ?: throw IllegalStateException("breedId required")
 
@@ -55,7 +52,6 @@ fun NavGraphBuilder.breedImagesGrid(
     )
 
     val onImageClick: (String) -> Unit = { imageId ->
-        Log.d("BreedImagesGrid", "onImageClick: breedId=$breedId, imageId=$imageId")
         navController.navigate("breeds/gallery/${breedId}?currentImage=$imageId")
     }
 
@@ -104,16 +100,14 @@ fun BreedGridScreen(
                 ) {
                     itemsIndexed(
                         items = state.images,
-                        key = { _, image: ViewBreedImage ->
+                        key = { _, image: UIBreedImage ->
                             image.id
                         },
-                    ) { _, image: ViewBreedImage ->
+                    ) { _, image: UIBreedImage ->
                         Card(
                             modifier = Modifier
                                 .size(cellSize)
-                                .clickable {
-                                    onImageClick(image.id)
-                                },
+                                .clickable { onImageClick(image.id) },
                         ) {
                             ImagePreview(
                                 modifier = Modifier.fillMaxSize(),
