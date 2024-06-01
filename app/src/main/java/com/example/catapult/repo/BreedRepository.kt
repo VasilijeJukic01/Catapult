@@ -47,6 +47,10 @@ object BreedRepository {
 
     fun allBreeds() : List<ViewBreed> = database.breedDao().getAll().map { it.asViewBreed() }
 
+    fun getAllImagesForBreed(breedId: String) = database.breedImageDao().getAllImagesForBreed(breedId)
+
+    fun getImageById(id: String) = database.breedImageDao().getImageById(id)
+
     fun getById(id: String) : ViewBreed? {
         return database.breedDao().getBreedById(id)?.asViewBreed()
     }

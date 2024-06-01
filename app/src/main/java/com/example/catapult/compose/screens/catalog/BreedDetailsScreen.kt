@@ -25,7 +25,6 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
@@ -36,7 +35,6 @@ import androidx.navigation.compose.composable
 import coil.compose.SubcomposeAsyncImage
 import com.example.catapult.compose.NoDataContent
 import com.example.catapult.model.catalog.ViewBreed
-import com.example.catapult.model.catalog.Characteristics
 import com.example.catapult.model.catalog.details.BreedDetailsState
 import com.example.catapult.model.catalog.details.BreedDetailsViewModel
 import com.example.catapult.ui.theme.topBarColor
@@ -45,7 +43,8 @@ import com.example.catapult.ui.theme.topBarColor
 @Composable
 fun BreedDetailsScreen(
     state: BreedDetailsState,
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    navController: NavController
 ) {
     Surface {
         Column (
@@ -96,7 +95,8 @@ fun BreedDetailsScreen(
                 }
                 (state.data != null) -> {
                     BreedDataLazyColumn(
-                        data = state.data
+                        data = state.data,
+                        navController = navController
                     )
                 }
                 else -> {
@@ -110,6 +110,7 @@ fun BreedDetailsScreen(
 @Composable
 fun BreedDataLazyColumn(
     data: ViewBreed,
+    navController: NavController
 ) {
 
     val openUrlLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
@@ -258,6 +259,18 @@ fun BreedDataLazyColumn(
             ) {
                 Text("Open Wikipedia Page")
             }
+            Button(
+                onClick = {
+                    navController.navigate("breeds/grid/${data.id}")
+                },
+                shape = RectangleShape,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .wrapContentWidth(Alignment.CenterHorizontally)
+            ) {
+                Text("View Images")
+            }
+
         }
     }
 }
@@ -300,10 +313,11 @@ fun NavGraphBuilder.breedDetailsScreen(
         state = state.value,
         onBackClick = {
             navController.popBackStack()
-        }
+        },
+        navController = navController
     )
 }
-
+/*
 // Preview
 @Preview
 @Composable
@@ -333,8 +347,9 @@ fun PreviewDetailsScreen() {
                     imageUrl = ""
                 ),
             ),
-            onBackClick = {}
+            onBackClick = {},
+            navController
         )
     }
 
-}
+}*/

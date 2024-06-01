@@ -14,4 +14,7 @@ interface BreedImageDAO {
 
     @Query("SELECT * FROM BreedImage WHERE breedId = :breedId")
     fun getAllImagesForBreed(breedId: String): List<BreedImage>
+
+    @Query("SELECT * FROM BreedImage WHERE id = :id")
+    fun getImageById(id: String): BreedImage
 }
