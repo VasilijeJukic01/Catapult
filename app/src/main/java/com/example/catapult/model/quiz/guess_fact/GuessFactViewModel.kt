@@ -52,12 +52,13 @@ class GuessFactViewModel (
             // Select Fact
             is GuessFactContract.GuessTheFactUiEvent.SelectFact -> {
                 val isCorrect = event.index == state.value.correctAnswer
-                setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect) }
+                setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
                 setEvent(GuessFactContract.GuessTheFactUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
             is GuessFactContract.GuessTheFactUiEvent.NextQuestion -> {
                 fetchGuessTheFactQuestions()
+                setState { copy(isCorrectAnswer = null) }
             }
         }
     }
@@ -68,9 +69,9 @@ class GuessFactViewModel (
                 val questions = repository.guessTheFactFetch()
                 val currentQuestion = questions.random()
                 val questionType = when (currentQuestion.questionType) {
-                    BreedRepository.QuestionType.GUESS_THE_BREED -> "Guess the breed"
-                    BreedRepository.QuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Guess the outlier temperament"
-                    BreedRepository.QuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Guess the correct temperament"
+                    QuestionType.GUESS_THE_BREED -> "Guess the breed"
+                    QuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Guess the outlier temperament"
+                    QuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Guess the correct temperament"
                 }
                 val catImage = currentQuestion.breedAndImage.second
                 val correctAnswer = currentQuestion.correctAnswer
@@ -87,6 +88,5 @@ class GuessFactViewModel (
             }
         }
     }
-
 
 }

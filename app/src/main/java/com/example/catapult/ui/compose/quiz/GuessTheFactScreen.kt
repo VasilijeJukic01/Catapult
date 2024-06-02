@@ -1,10 +1,16 @@
 package com.example.catapult.ui.compose.quiz
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -32,6 +38,7 @@ import androidx.navigation.compose.composable
 import coil.compose.rememberAsyncImagePainter
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Color
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract
 import com.example.catapult.model.quiz.guess_fact.GuessFactViewModel
 import java.util.Locale
@@ -44,78 +51,97 @@ fun GuessTheFactScreen(
     onSkipClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 56.dp)
-            .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        TopAppBar(
-            title = { Text("Quiz") },
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+    val correctColor = Color.Green
+    val incorrectColor = Color.Red
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            TopAppBar(
+                title = { Text("Menu") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
+            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Question ${state.currentQuestionNumber} of 20",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Total Points: ${state.totalCorrect}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Text(
+                text = state.question,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            Image(
+                painter = rememberAsyncImagePainter(state.catImage.url),
+                contentDescription = "Cat Image",
+                modifier = Modifier
+                    .size(300.dp)
+                    .aspectRatio(1f)
+                    .padding(bottom = 16.dp)
+            )
+            LazyVerticalGrid(
+                columns = GridCells.Fixed(2),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .weight(1f)
+                    .padding(bottom = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                horizontalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                items(state.options.size) { index ->
+                    Button(
+                        onClick = { onFactOptionClick(index) },
+                        modifier = Modifier
+                            .width(100.dp)
+                            .height(100.dp)
+                    ) {
+                        Text(
+                            text = state.options[index].uppercase(Locale.ROOT),
+                            style = MaterialTheme.typography.titleMedium
+                        )
+                    }
                 }
             }
-        )
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "Question ${state.currentQuestionNumber} of 20",
-                style = MaterialTheme.typography.bodyMedium
-            )
-            Text(
-                text = "Total Points: ${state.totalCorrect}",
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Button(
+                onClick = onSkipClick,
+                modifier = Modifier
+                    .align(Alignment.CenterHorizontally)
+                    .padding(bottom = 16.dp)
+            ) {
+                Text("Skip Question")
+            }
         }
-        Text(
-            text = state.question,
-            style = MaterialTheme.typography.titleLarge,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Image(
-            painter = rememberAsyncImagePainter(state.catImage.url),
-            contentDescription = "Cat Image",
-            modifier = Modifier
-                .size(300.dp)
-                .aspectRatio(1f)
-                .padding(bottom = 16.dp)
-        )
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            items(state.options.size) { index ->
-                Button(
-                    onClick = { onFactOptionClick(index) },
-                    modifier = Modifier
-                        .width(100.dp)
-                        .height(100.dp)
-                ) {
-                    Text(
-                        text = state.options[index].uppercase(Locale.ROOT),
-                        style = MaterialTheme.typography.titleMedium
+        state.isCorrectAnswer?.let { isCorrect ->
+            val color = if (isCorrect) correctColor else incorrectColor
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color.copy(alpha = 0.3f))
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearOutSlowInEasing
+                        )
                     )
-                }
-            }
-        }
-        Button(
-            onClick = onSkipClick,
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .padding(bottom = 16.dp)
-        ) {
-            Text("Skip Question")
+            )
         }
     }
 }

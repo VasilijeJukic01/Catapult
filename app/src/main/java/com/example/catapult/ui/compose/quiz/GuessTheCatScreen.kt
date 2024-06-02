@@ -1,11 +1,17 @@
 package com.example.catapult.ui.compose.quiz
 
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -23,6 +29,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -43,74 +50,95 @@ fun GuessTheCatScreen(
     onSkipClick: () -> Unit,
     onBackClick: () -> Unit
 ) {
-    TopAppBar(
-        title = { Text("Quiz") },
-        navigationIcon = {
-            IconButton(onClick = onBackClick) {
-                Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-            }
-        }
-    )
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 56.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+    val correctColor = Color.Green
+    val incorrectColor = Color.Red
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 1.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
-                text = "Question ${state.currentQuestionNumber} of 20",
-                style = MaterialTheme.typography.bodyMedium
+            TopAppBar(
+                title = { Text("Quiz") },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                    }
+                }
             )
-            Text(
-                text = "Total Points: ${state.totalCorrect}",
-                style = MaterialTheme.typography.bodyMedium
-            )
-        }
-        Text(
-            text = state.question,
-            style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(16.dp)
-        )
-        Column {
             Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
+                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                state.catImages.take(2).forEachIndexed { index, catImage ->
-                    Image(
-                        painter = rememberAsyncImagePainter(catImage.url),
-                        contentDescription = "Cat Image",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .aspectRatio(1f)
-                            .clickable { onCatImageClick(index) }
-                    )
+                Text(
+                    text = "Question ${state.currentQuestionNumber} of 20",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Text(
+                    text = "Total Points: ${state.totalCorrect}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Text(
+                text = state.question,
+                style = MaterialTheme.typography.bodyMedium,
+                modifier = Modifier.padding(16.dp)
+            )
+            Column {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    state.catImages.take(2).forEachIndexed { index, catImage ->
+                        Image(
+                            painter = rememberAsyncImagePainter(catImage.url),
+                            contentDescription = "Cat Image",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .aspectRatio(1f)
+                                .clickable { onCatImageClick(index) }
+                        )
+                    }
+                }
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceEvenly
+                ) {
+                    state.catImages.drop(2).forEachIndexed { index, catImage ->
+                        Image(
+                            painter = rememberAsyncImagePainter(catImage.url),
+                            contentDescription = "Cat Image",
+                            modifier = Modifier
+                                .size(150.dp)
+                                .aspectRatio(1f)
+                                .clickable { onCatImageClick(index + 2) }
+                        )
+                    }
                 }
             }
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                state.catImages.drop(2).forEachIndexed { index, catImage ->
-                    Image(
-                        painter = rememberAsyncImagePainter(catImage.url),
-                        contentDescription = "Cat Image",
-                        modifier = Modifier
-                            .size(150.dp)
-                            .aspectRatio(1f)
-                            .clickable { onCatImageClick(index + 2) }
-                    )
-                }
+            Button(onClick = onSkipClick, modifier = Modifier.padding(16.dp)) {
+                Text("Skip Question")
             }
         }
-        Button(onClick = onSkipClick, modifier = Modifier.padding(16.dp)) {
-            Text("Skip Question")
+
+        state.isCorrectAnswer?.let { isCorrect ->
+            val color = if (isCorrect) correctColor else incorrectColor
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color.copy(alpha = 0.3f))
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearOutSlowInEasing
+                        )
+                    )
+            )
         }
     }
+
 }
 
 fun NavGraphBuilder.guessTheCatScreen(

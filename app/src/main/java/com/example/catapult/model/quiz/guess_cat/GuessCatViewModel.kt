@@ -52,12 +52,13 @@ class GuessCatViewModel (
             // Select Cat Image
             is GuessTheCatUiEvent.SelectCatImage -> {
                 val isCorrect = event.index == state.value.correctAnswer
-                setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect) }
+                setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
                 setEvent(GuessTheCatUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
             is GuessTheCatUiEvent.NextQuestion -> {
                 fetchGuessTheCatQuestions()
+                setState { copy(isCorrectAnswer = null) }
             }
         }
     }
