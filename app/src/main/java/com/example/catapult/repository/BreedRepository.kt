@@ -5,11 +5,14 @@ import com.example.catapult.api.BreedsApi
 import com.example.catapult.api.networking.retrofit
 import com.example.catapult.database.CatapultDatabase
 import com.example.catapult.model.catalog.UIBreed
+import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.model.mappers.asBreedDbModel
 import com.example.catapult.model.mappers.asBreedImageDbModel
 import com.example.catapult.model.mappers.asViewBreed
+import com.example.catapult.model.mappers.asViewBreedImage
 import kotlinx.coroutines.async
 import kotlinx.coroutines.coroutineScope
+import kotlin.random.Random
 
 object BreedRepository {
 
@@ -55,6 +58,38 @@ object BreedRepository {
 
     fun getById(id: String) : UIBreed? {
         return database.breedDao().getBreedById(id)?.asViewBreed()
+    }
+
+    // Quiz Getters
+    fun guessTheCatFetch(): List<Pair<UIBreed, UIBreedImage>> {
+        val allBreeds = allBreeds()
+        val allTemperaments = allBreeds.flatMap { it.temperament }.distinct()
+
+        val randomTemperament = allTemperaments.random()
+
+        val matchingBreeds = allBreeds.filter { it.temperament.contains(randomTemperament) }
+        val nonMatchingBreeds = allBreeds.filter { !it.temperament.contains(randomTemperament) }
+
+        if (matchingBreeds.isEmpty() || nonMatchingBreeds.size < 3) {
+            throw Exception("Not enough breeds for the game")
+        }
+
+        val selectedMatchingBreed = matchingBreeds[Random.nextInt(matchingBreeds.size)]
+        val selectedNonMatchingBreeds = nonMatchingBreeds.shuffled().take(3)
+
+        val selectedBreeds = (listOf(selectedMatchingBreed) + selectedNonMatchingBreeds).filter { breed ->
+            val images = allImagesForBreed(breed.id)
+            images.isNotEmpty()
+        }
+
+        if (selectedBreeds.size < 4) {
+            throw Exception("Not enough breeds with images for the game")
+        }
+
+        return selectedBreeds.map { breed ->
+            val images = allImagesForBreed(breed.id)
+            Pair(breed, images[Random.nextInt(images.size)].asViewBreedImage())
+        }
     }
 
 }
