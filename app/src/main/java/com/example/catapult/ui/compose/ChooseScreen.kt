@@ -27,7 +27,7 @@ fun ChooseScreen(navController: NavController) {
         }
 
         Button(
-            onClick = { navController.navigate("guessTheCat") },
+            onClick = { navController.navigate("guessTheFact") },
             modifier = Modifier.padding(8.dp)
         ) {
             Text("Quiz")

@@ -92,4 +92,55 @@ object BreedRepository {
         }
     }
 
+    fun guessTheFactFetch(): List<QuizQuestion> {
+        val allBreeds = allBreeds()
+        if (allBreeds.isEmpty()) {
+            throw Exception("No breeds available for the game")
+        }
+        val questions = mutableListOf<QuizQuestion>()
+
+        // Question Type 2: Guess the outlier temperament
+        val outlierQuestionBreed = allBreeds.random()
+        val outlierQuestionImage = allImagesForBreed(outlierQuestionBreed.id).random().asViewBreedImage()
+        val outlierTemperaments = outlierQuestionBreed.temperament.shuffled().take(3)
+        if (outlierTemperaments.isEmpty()) {
+            throw Exception("No temperaments available for the outlier question breed")
+        }
+        val otherTemperaments = allBreeds.filter { it != outlierQuestionBreed }.flatMap { it.temperament }.distinct()
+        if (otherTemperaments.isEmpty()) {
+            throw Exception("No other temperaments available for the outlier question")
+        }
+        val outlierQuestionOptions = (outlierTemperaments + otherTemperaments.first()).shuffled()
+        val outlierQuestionCorrectAnswer = outlierQuestionOptions.indexOfFirst { !outlierQuestionBreed.temperament.contains(it) }
+        questions.add(QuizQuestion(QuestionType.GUESS_THE_OUTLIER_TEMPERAMENT, Pair(outlierQuestionBreed, outlierQuestionImage), outlierQuestionOptions, outlierQuestionCorrectAnswer))
+
+        // Question Type 3: Guess the correct temperament
+        val temperamentQuestionBreed = allBreeds.random()
+        val temperamentQuestionImage = allImagesForBreed(temperamentQuestionBreed.id).random().asViewBreedImage()
+        val correctTemperament = temperamentQuestionBreed.temperament.random()
+        val otherTemperamentsForCorrect = allBreeds.flatMap { it.temperament }.distinct().filter { it != correctTemperament }.shuffled().take(3)
+        if (otherTemperamentsForCorrect.isEmpty()) {
+            throw Exception("No other temperaments available for the correct temperament question")
+        }
+        val temperamentQuestionOptions = (otherTemperamentsForCorrect + correctTemperament).shuffled()
+        val temperamentQuestionCorrectAnswer = temperamentQuestionOptions.indexOf(correctTemperament)
+        questions.add(QuizQuestion(QuestionType.GUESS_THE_CORRECT_TEMPERAMENT, Pair(temperamentQuestionBreed, temperamentQuestionImage), temperamentQuestionOptions, temperamentQuestionCorrectAnswer))
+
+        return questions
+    }
+
+    enum class QuestionType {
+        GUESS_THE_BREED,
+        GUESS_THE_OUTLIER_TEMPERAMENT,
+        GUESS_THE_CORRECT_TEMPERAMENT
+    }
+
+    data class QuizQuestion(
+        val questionType: QuestionType,
+        val breedAndImage: Pair<UIBreed, UIBreedImage>,
+        val options: List<String>,
+        val correctAnswer: Int
+    )
+
+
 }

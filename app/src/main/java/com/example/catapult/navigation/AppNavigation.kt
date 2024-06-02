@@ -12,6 +12,7 @@ import com.example.catapult.ui.compose.breedsListScreen
 import com.example.catapult.ui.compose.breedGalleryScreen
 import com.example.catapult.ui.compose.breedImagesGrid
 import com.example.catapult.ui.compose.quiz.guessTheCatScreen
+import com.example.catapult.ui.compose.quiz.guessTheFactScreen
 
 @Composable
 fun AppNavigation() {
@@ -58,6 +59,10 @@ fun AppNavigation() {
                 }
             ),
             onClose = { navController.navigateUp() }
+        )
+        guessTheFactScreen(
+            route = "guessTheFact",
+            navController = navController,
         )
         guessTheCatScreen(
             route = "guessTheCat",
