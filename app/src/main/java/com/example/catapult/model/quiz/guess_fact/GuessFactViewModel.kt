@@ -2,6 +2,7 @@ package com.example.catapult.model.quiz.guess_fact
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.model.quiz.SecondQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -68,17 +69,20 @@ class GuessFactViewModel (
             withContext(Dispatchers.IO) {
                 val questions = repository.guessTheFactFetch()
                 val currentQuestion = questions.random()
-                val questionType = when (currentQuestion.questionType) {
-                    QuestionType.GUESS_THE_BREED -> "Guess the breed"
-                    QuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Guess the outlier temperament"
-                    QuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Guess the correct temperament"
+
+                val questionType = currentQuestion.secondQuestionType
+                val question = when (questionType) {
+                    SecondQuestionType.GUESS_THE_BREED -> "Which cat is this?"
+                    SecondQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Which temperament is not associated with the breed?"
+                    SecondQuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Which temperament is associated with this breed?"
                 }
+
                 val catImage = currentQuestion.breedAndImage.second
                 val correctAnswer = currentQuestion.correctAnswer
 
                 setState {
                     copy(
-                        question = questionType,
+                        question = question,
                         options = currentQuestion.options,
                         catImage = catImage,
                         correctAnswer = correctAnswer,

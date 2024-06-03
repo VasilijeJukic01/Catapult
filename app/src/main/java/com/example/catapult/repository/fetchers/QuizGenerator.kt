@@ -3,8 +3,8 @@ package com.example.catapult.repository.fetchers
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.model.mappers.asViewBreedImage
-import com.example.catapult.model.quiz.guess_fact.QuestionType
-import com.example.catapult.model.quiz.guess_fact.QuizQuestion
+import com.example.catapult.model.quiz.SecondQuestionType
+import com.example.catapult.model.quiz.SecondQuizQuestion
 import kotlinx.coroutines.runBlocking
 
 class QuizGenerator(private val breedFetcher: BreedFetcher) {
@@ -13,8 +13,19 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     fun guessTheCatFetch(): List<Pair<UIBreed, UIBreedImage>> {
         val allBreeds = breedFetcher.allBreeds()
         val allTemperaments = allBreeds.flatMap { it.temperament }.distinct()
-        val randomTemperament = allTemperaments.random()
 
+        val questionType = listOf("1", "2").random()
+
+        return when (questionType) {
+            "1" -> generateTemperamentQuestion(allBreeds, allTemperaments)
+            "2" -> generateBreedQuestion(allBreeds)
+            else -> throw Exception("Invalid question type")
+        }
+    }
+
+    // [Quiz Category I] Guess the Breed Temperament by Image
+    private fun generateTemperamentQuestion(allBreeds: List<UIBreed>, allTemperaments: List<String>): List<Pair<UIBreed, UIBreedImage>> {
+        val randomTemperament = allTemperaments.random()
         val matchingBreeds = allBreeds.filter { it.temperament.contains(randomTemperament) }
         val nonMatchingBreeds = allBreeds.filter { !it.temperament.contains(randomTemperament) }
 
@@ -36,8 +47,20 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
         }
     }
 
+    // [Quiz Category I] Guess the Breed Name by Image
+    private fun generateBreedQuestion(allBreeds: List<UIBreed>): List<Pair<UIBreed, UIBreedImage>> {
+        val chosenBreed = allBreeds.random()
+        val otherBreeds = allBreeds.filter { it != chosenBreed }.shuffled().take(3)
+        val selectedBreeds = (listOf(chosenBreed) + otherBreeds).shuffled()
+
+        return selectedBreeds.map { breed ->
+            val images = breedFetcher.allImagesForBreed(breed.id)
+            Pair(breed, images.random().asViewBreedImage())
+        }
+    }
+
     // Quiz Category II
-    suspend fun guessTheFactFetch(): List<QuizQuestion> = runBlocking {
+    suspend fun guessTheFactFetch(): List<SecondQuizQuestion> = runBlocking {
         val allBreeds = breedFetcher.allBreeds().takeIf { it.isNotEmpty() } ?: breedFetcher.fetchAllBreeds().run { breedFetcher.allBreeds() }
 
         listOf(
@@ -48,13 +71,13 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Breed Name
-    private suspend fun generateGuessTheBreedNameQuestion(allBreeds: List<UIBreed>): QuizQuestion {
+    private suspend fun generateGuessTheBreedNameQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
         val breedQuestionBreed = getRandomBreedWithImages(allBreeds)
         val breedQuestionImage = getRandomImageForBreed(breedQuestionBreed.id)
         val breedQuestionOptions = generateShuffledOptions(breedQuestionBreed.name, allBreeds.map { it.name })
 
-        return QuizQuestion(
-            QuestionType.GUESS_THE_BREED,
+        return SecondQuizQuestion(
+            SecondQuestionType.GUESS_THE_BREED,
             Pair(breedQuestionBreed, breedQuestionImage),
             breedQuestionOptions,
             breedQuestionOptions.indexOf(breedQuestionBreed.name)
@@ -62,7 +85,7 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Outlier Temperament
-    private suspend fun generateOutlierTemperamentQuestion(allBreeds: List<UIBreed>): QuizQuestion {
+    private suspend fun generateOutlierTemperamentQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
         val outlierQuestionBreed = getRandomBreedWithImages(allBreeds)
         val outlierQuestionImage = getRandomImageForBreed(outlierQuestionBreed.id)
         val outlierTemperaments = outlierQuestionBreed.temperament.shuffled().take(3)
@@ -71,8 +94,8 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
         val outlierQuestionOptions = (outlierTemperaments + otherTemperaments.random()).shuffled()
         val outlierQuestionCorrectAnswer = outlierQuestionOptions.indexOfFirst { it !in outlierTemperaments }
 
-        return QuizQuestion(
-            QuestionType.GUESS_THE_OUTLIER_TEMPERAMENT,
+        return SecondQuizQuestion(
+            SecondQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT,
             Pair(outlierQuestionBreed, outlierQuestionImage),
             outlierQuestionOptions,
             outlierQuestionCorrectAnswer
@@ -80,7 +103,7 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Correct Temperament
-    private suspend fun generateCorrectTemperamentQuestion(allBreeds: List<UIBreed>): QuizQuestion {
+    private suspend fun generateCorrectTemperamentQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
         val temperamentQuestionBreed = getRandomBreedWithImages(allBreeds)
         val temperamentQuestionImage = getRandomImageForBreed(temperamentQuestionBreed.id)
         val correctTemperament = temperamentQuestionBreed.temperament.random()
@@ -89,8 +112,8 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
         val temperamentQuestionOptions = (otherTemperaments.shuffled().take(3) + correctTemperament).shuffled()
         val temperamentQuestionCorrectAnswer = temperamentQuestionOptions.indexOf(correctTemperament)
 
-        return QuizQuestion(
-            QuestionType.GUESS_THE_CORRECT_TEMPERAMENT,
+        return SecondQuizQuestion(
+            SecondQuestionType.GUESS_THE_CORRECT_TEMPERAMENT,
             Pair(temperamentQuestionBreed, temperamentQuestionImage),
             temperamentQuestionOptions,
             temperamentQuestionCorrectAnswer

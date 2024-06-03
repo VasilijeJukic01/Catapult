@@ -18,15 +18,4 @@ interface GuessCatContract {
         data class NextQuestion(val correct: Boolean) : GuessTheCatUiEvent()
     }
 
-    enum class QuestionType {
-        GUESS_THE_TEMPERAMENT,
-        GUESS_THE_BREED
-    }
-
-    data class QuizQuestion(
-        val questionType: QuestionType,
-        val breedAndImages: List<Pair<String, UIBreedImage>>,
-        val correctAnswer: Int
-    )
-
 }
