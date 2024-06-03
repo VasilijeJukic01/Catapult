@@ -3,8 +3,10 @@ package com.example.catapult.repository.fetchers
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.model.mappers.asViewBreedImage
-import com.example.catapult.model.quiz.SecondQuestionType
-import com.example.catapult.model.quiz.SecondQuizQuestion
+import com.example.catapult.model.quiz.GuessCatQuestionType
+import com.example.catapult.model.quiz.GuessCatQuestion
+import com.example.catapult.model.quiz.LeftOrRightQuestion
+import com.example.catapult.model.quiz.LeftOrRightQuestionType
 import kotlinx.coroutines.runBlocking
 
 class QuizGenerator(private val breedFetcher: BreedFetcher) {
@@ -60,7 +62,7 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // Quiz Category II
-    suspend fun guessTheFactFetch(): List<SecondQuizQuestion> = runBlocking {
+    suspend fun guessTheFactFetch(): List<GuessCatQuestion> = runBlocking {
         val allBreeds = breedFetcher.allBreeds().takeIf { it.isNotEmpty() } ?: breedFetcher.fetchAllBreeds().run { breedFetcher.allBreeds() }
 
         listOf(
@@ -71,13 +73,13 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Breed Name
-    private suspend fun generateGuessTheBreedNameQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
+    private suspend fun generateGuessTheBreedNameQuestion(allBreeds: List<UIBreed>): GuessCatQuestion {
         val breedQuestionBreed = getRandomBreedWithImages(allBreeds)
         val breedQuestionImage = getRandomImageForBreed(breedQuestionBreed.id)
         val breedQuestionOptions = generateShuffledOptions(breedQuestionBreed.name, allBreeds.map { it.name })
 
-        return SecondQuizQuestion(
-            SecondQuestionType.GUESS_THE_BREED,
+        return GuessCatQuestion(
+            GuessCatQuestionType.GUESS_THE_BREED,
             Pair(breedQuestionBreed, breedQuestionImage),
             breedQuestionOptions,
             breedQuestionOptions.indexOf(breedQuestionBreed.name)
@@ -85,7 +87,7 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Outlier Temperament
-    private suspend fun generateOutlierTemperamentQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
+    private suspend fun generateOutlierTemperamentQuestion(allBreeds: List<UIBreed>): GuessCatQuestion {
         val outlierQuestionBreed = getRandomBreedWithImages(allBreeds)
         val outlierQuestionImage = getRandomImageForBreed(outlierQuestionBreed.id)
         val outlierTemperaments = outlierQuestionBreed.temperament.shuffled().take(3)
@@ -94,8 +96,8 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
         val outlierQuestionOptions = (outlierTemperaments + otherTemperaments.random()).shuffled()
         val outlierQuestionCorrectAnswer = outlierQuestionOptions.indexOfFirst { it !in outlierTemperaments }
 
-        return SecondQuizQuestion(
-            SecondQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT,
+        return GuessCatQuestion(
+            GuessCatQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT,
             Pair(outlierQuestionBreed, outlierQuestionImage),
             outlierQuestionOptions,
             outlierQuestionCorrectAnswer
@@ -103,7 +105,7 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
     }
 
     // [Quiz Category II] Guess the Correct Temperament
-    private suspend fun generateCorrectTemperamentQuestion(allBreeds: List<UIBreed>): SecondQuizQuestion {
+    private suspend fun generateCorrectTemperamentQuestion(allBreeds: List<UIBreed>): GuessCatQuestion {
         val temperamentQuestionBreed = getRandomBreedWithImages(allBreeds)
         val temperamentQuestionImage = getRandomImageForBreed(temperamentQuestionBreed.id)
         val correctTemperament = temperamentQuestionBreed.temperament.random()
@@ -112,13 +114,56 @@ class QuizGenerator(private val breedFetcher: BreedFetcher) {
         val temperamentQuestionOptions = (otherTemperaments.shuffled().take(3) + correctTemperament).shuffled()
         val temperamentQuestionCorrectAnswer = temperamentQuestionOptions.indexOf(correctTemperament)
 
-        return SecondQuizQuestion(
-            SecondQuestionType.GUESS_THE_CORRECT_TEMPERAMENT,
+        return GuessCatQuestion(
+            GuessCatQuestionType.GUESS_THE_CORRECT_TEMPERAMENT,
             Pair(temperamentQuestionBreed, temperamentQuestionImage),
             temperamentQuestionOptions,
             temperamentQuestionCorrectAnswer
         )
     }
+
+    //QUIZ CATEGORY III
+    suspend fun leftOrRightFetch(): List<LeftOrRightQuestion> {
+        val allBreeds = breedFetcher.allBreeds().takeIf { it.isNotEmpty() } ?: breedFetcher.fetchAllBreeds().run { breedFetcher.allBreeds() }
+
+        return listOf(
+            generateWhichCatIsHeavierQuestion(allBreeds),
+            generateWhichCatLivesLongerQuestion(allBreeds)
+        )
+    }
+
+    // [Quiz Category III] Which Cat is Heavier?
+    private fun generateWhichCatIsHeavierQuestion(allBreeds: List<UIBreed>): LeftOrRightQuestion {
+        val breed1 = allBreeds.random()
+        val breed2 = allBreeds.filter { it != breed1 }.random()
+
+        val breed1Image = getRandomImageForBreed(breed1.id)
+        val breed2Image = getRandomImageForBreed(breed2.id)
+
+        return LeftOrRightQuestion(
+            LeftOrRightQuestionType.WHICH_CAT_IS_HEAVIER,
+            Pair(breed1, breed1Image),
+            Pair(breed2, breed2Image),
+            if (breed1.weight > breed2.weight) 0 else 1
+        )
+    }
+
+    // [Quiz Category III] Which Cat Lives Longer?
+    private fun generateWhichCatLivesLongerQuestion(allBreeds: List<UIBreed>): LeftOrRightQuestion {
+        val breed1 = allBreeds.random()
+        val breed2 = allBreeds.filter { it != breed1 }.random()
+
+        val breed1Image = getRandomImageForBreed(breed1.id)
+        val breed2Image = getRandomImageForBreed(breed2.id)
+
+        return LeftOrRightQuestion(
+            LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER,
+            Pair(breed1, breed1Image),
+            Pair(breed2, breed2Image),
+            if (breed1.lifeSpan > breed2.lifeSpan) 0 else 1
+        )
+    }
+
 
     // Helper
     private suspend fun getRandomBreedWithImages(allBreeds: List<UIBreed>): UIBreed {

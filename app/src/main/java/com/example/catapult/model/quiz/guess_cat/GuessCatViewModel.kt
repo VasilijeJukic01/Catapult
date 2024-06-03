@@ -2,7 +2,7 @@ package com.example.catapult.model.quiz.guess_cat
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.model.quiz.FirstQuestionType
+import com.example.catapult.model.quiz.GuessFactQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.example.catapult.model.quiz.guess_cat.GuessCatContract.GuessTheCatState
@@ -72,10 +72,10 @@ class GuessCatViewModel (
                 val catImages = catBreedsAndImages.map { it.second }
                 val correctAnswer = catImages.indices.random()
 
-                val questionType = FirstQuestionType.entries.toTypedArray().random()
+                val questionType = GuessFactQuestionType.entries.toTypedArray().random()
                 val question = when (questionType) {
-                    FirstQuestionType.GUESS_THE_TEMPERAMENT -> "Which cat is ${catBreedsAndImages[correctAnswer].first.temperament.random()}?"
-                    FirstQuestionType.GUESS_THE_BREED -> "Which cat is of the breed ${catBreedsAndImages[correctAnswer].first.name}?"
+                    GuessFactQuestionType.GUESS_THE_TEMPERAMENT -> "Which cat is ${catBreedsAndImages[correctAnswer].first.temperament.random()}?"
+                    GuessFactQuestionType.GUESS_THE_BREED -> "Which cat is of the breed ${catBreedsAndImages[correctAnswer].first.name}?"
                 }
 
                 setState { copy(

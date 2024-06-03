@@ -13,6 +13,7 @@ import com.example.catapult.ui.compose.breedGalleryScreen
 import com.example.catapult.ui.compose.breedImagesGrid
 import com.example.catapult.ui.compose.quiz.guessTheCatScreen
 import com.example.catapult.ui.compose.quiz.guessTheFactScreen
+import com.example.catapult.ui.compose.quiz.leftOrRightScreen
 
 @Composable
 fun AppNavigation() {
@@ -68,6 +69,9 @@ fun AppNavigation() {
             route = "guessTheCat",
             navController = navController,
         )
+        leftOrRightScreen(
+            route = "leftOrRight",
+            navController = navController,)
     }
 
 }

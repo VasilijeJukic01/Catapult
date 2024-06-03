@@ -5,7 +5,8 @@ import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.api.BreedsApi
 import com.example.catapult.api.networking.retrofit
 import com.example.catapult.database.CatapultDatabase
-import com.example.catapult.model.quiz.SecondQuizQuestion
+import com.example.catapult.model.quiz.GuessCatQuestion
+import com.example.catapult.model.quiz.LeftOrRightQuestion
 import com.example.catapult.repository.fetchers.BreedFetcher
 import com.example.catapult.repository.fetchers.QuizGenerator
 
@@ -27,6 +28,7 @@ object BreedRepository {
 
     // Quiz Getters
     fun guessTheCatFetch(): List<Pair<UIBreed, UIBreedImage>> = quizGenerator.guessTheCatFetch()
-    suspend fun guessTheFactFetch(): List<SecondQuizQuestion> = quizGenerator.guessTheFactFetch()
+    suspend fun guessTheFactFetch(): List<GuessCatQuestion> = quizGenerator.guessTheFactFetch()
+    suspend fun leftOrRightFetch(): List<LeftOrRightQuestion> = quizGenerator.leftOrRightFetch()
 
 }

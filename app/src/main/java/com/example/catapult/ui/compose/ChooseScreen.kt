@@ -49,7 +49,7 @@ fun ChooseScreen(navController: NavController) {
                 Text("Catalog", fontSize = 20.sp)
             }
             Button(
-                onClick = { navController.navigate("guessTheCat") },
+                onClick = { navController.navigate("leftOrRight") },
                 modifier = Modifier
                     .padding(8.dp)
                     .width(160.dp)
