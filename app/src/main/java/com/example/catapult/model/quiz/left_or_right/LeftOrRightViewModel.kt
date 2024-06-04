@@ -1,8 +1,10 @@
 package com.example.catapult.model.quiz.left_or_right
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.quiz.LeftOrRightQuestionType
+import com.example.catapult.model.quiz.guess_cat.GuessCatContract
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,9 +35,20 @@ class LeftOrRightViewModel (
     fun setEvent(event: LeftOrRightUiEvent) =
         viewModelScope.launch { eventsFlow.emit(event) }
 
+    // Timer
+    private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            setState { copy(timeLeft = millisUntilFinished / 1000) }
+        }
+        override fun onFinish() {
+            setEvent(LeftOrRightUiEvent.TimeUp)
+        }
+    }
+
     init {
         handleEvents()
         fetchLeftOrRightQuestions()
+        timer.start()
     }
 
     // Events
@@ -62,6 +75,10 @@ class LeftOrRightViewModel (
             is LeftOrRightUiEvent.NextQuestion -> {
                 fetchLeftOrRightQuestions()
                 setState { copy(isCorrectAnswer = null) }
+            }
+            // Time Up
+            is LeftOrRightUiEvent.TimeUp -> {
+                // TODO: Handle Time Up
             }
         }
     }

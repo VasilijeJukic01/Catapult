@@ -10,12 +10,14 @@ interface LeftOrRightContract {
         val correctAnswer: Int = -1,
         val totalCorrect: Int = 0,
         val currentQuestionNumber: Int = 0,
-        val isCorrectAnswer: Boolean? = null
+        val isCorrectAnswer: Boolean? = null,
+        val timeLeft: Long = 0L
     )
 
     sealed class LeftOrRightUiEvent{
         data class SelectLeftOrRight(val index: Int) : LeftOrRightUiEvent()
         data class NextQuestion(val correct: Boolean) : LeftOrRightUiEvent()
+        data object TimeUp : LeftOrRightUiEvent()
     }
 
 }

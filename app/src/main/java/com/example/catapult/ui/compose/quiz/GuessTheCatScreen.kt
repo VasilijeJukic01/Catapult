@@ -80,6 +80,10 @@ fun GuessTheCatScreen(
                     text = "Total Points: ${state.totalCorrect}",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Text(
                 text = state.question,
@@ -149,18 +153,23 @@ fun NavGraphBuilder.guessTheCatScreen(
 
     val state by guessCatViewModel.state.collectAsState()
 
-    GuessTheCatScreen(
-        state = state,
-        onCatImageClick = { index ->
-            guessCatViewModel.setEvent(GuessTheCatUiEvent.SelectCatImage(index))
-        },
-        onSkipClick = {
-            guessCatViewModel.setEvent(GuessTheCatUiEvent.NextQuestion(false))
-        },
-        onBackClick = {
-            navController.popBackStack()
-        }
-    )
+    if (state.timeLeft == 0L) {
+        // TODO: Navigate to Time Up Screen
+    }
+    else {
+        GuessTheCatScreen(
+            state = state,
+            onCatImageClick = { index ->
+                guessCatViewModel.setEvent(GuessTheCatUiEvent.SelectCatImage(index))
+            },
+            onSkipClick = {
+                guessCatViewModel.setEvent(GuessTheCatUiEvent.NextQuestion(false))
+            },
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)

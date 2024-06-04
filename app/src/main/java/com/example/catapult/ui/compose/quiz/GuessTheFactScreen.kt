@@ -83,6 +83,10 @@ fun GuessTheFactScreen(
                     text = "Total Points: ${state.totalCorrect}",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Text(
                 text = state.question,
@@ -155,16 +159,21 @@ fun NavGraphBuilder.guessTheFactScreen(
 
     val state by guessFactViewModel.state.collectAsState()
 
-    GuessTheFactScreen(
-        state = state,
-        onFactOptionClick = { index ->
-            guessFactViewModel.setEvent(GuessFactContract.GuessTheFactUiEvent.SelectFact(index))
-        },
-        onSkipClick = {
-            guessFactViewModel.setEvent(GuessFactContract.GuessTheFactUiEvent.NextQuestion(false))
-        },
-        onBackClick = {
-            navController.popBackStack()
-        }
-    )
+    if (state.timeLeft == 0L) {
+        // TODO: Navigate to Time Up Screen
+    }
+    else {
+        GuessTheFactScreen(
+            state = state,
+            onFactOptionClick = { index ->
+                guessFactViewModel.setEvent(GuessFactContract.GuessTheFactUiEvent.SelectFact(index))
+            },
+            onSkipClick = {
+                guessFactViewModel.setEvent(GuessFactContract.GuessTheFactUiEvent.NextQuestion(false))
+            },
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+    }
 }

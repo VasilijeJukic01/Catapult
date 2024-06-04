@@ -73,6 +73,10 @@ fun LeftOrRightScreen(
                     text = "Total Points: ${state.totalCorrect}",
                     style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
             Text(
                 text = state.question,
@@ -125,18 +129,23 @@ fun NavGraphBuilder.leftOrRightScreen(
 
     val state by leftOrRightViewModel.state.collectAsState()
 
-    LeftOrRightScreen(
-        state = state,
-        onCatImageClick = { index ->
-            leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
-        },
-        onSkipClick = {
-            leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
-        },
-        onBackClick = {
-            navController.popBackStack()
-        }
-    )
+    if (state.timeLeft == 0L) {
+        // TODO: Navigate to Time Up Screen
+    }
+    else {
+        LeftOrRightScreen(
+            state = state,
+            onCatImageClick = { index ->
+                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
+            },
+            onSkipClick = {
+                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
+            },
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+    }
 }
 
 @Preview(showBackground = true)

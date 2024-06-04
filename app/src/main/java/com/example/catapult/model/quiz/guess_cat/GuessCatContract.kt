@@ -10,12 +10,14 @@ interface GuessCatContract {
         val correctAnswer: Int = -1,
         val totalCorrect: Int = 0,
         val currentQuestionNumber: Int = 0,
-        val isCorrectAnswer: Boolean? = null
+        val isCorrectAnswer: Boolean? = null,
+        val timeLeft: Long = 0L
     )
 
     sealed class GuessTheCatUiEvent{
         data class SelectCatImage(val index: Int) : GuessTheCatUiEvent()
         data class NextQuestion(val correct: Boolean) : GuessTheCatUiEvent()
+        data object TimeUp : GuessTheCatUiEvent()
     }
 
 }

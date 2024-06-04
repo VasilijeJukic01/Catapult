@@ -1,5 +1,6 @@
 package com.example.catapult.model.quiz.guess_cat
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.quiz.GuessFactQuestionType
@@ -31,9 +32,20 @@ class GuessCatViewModel (
 
     fun setEvent(event: GuessTheCatUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }
 
+    // Timer
+    private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            setState { copy(timeLeft = millisUntilFinished / 1000) }
+        }
+        override fun onFinish() {
+            setEvent(GuessTheCatUiEvent.TimeUp)
+        }
+    }
+
     init {
         handleEvents()
         fetchGuessTheCatQuestions()
+        timer.start()
     }
 
     // Events
@@ -60,6 +72,10 @@ class GuessCatViewModel (
             is GuessTheCatUiEvent.NextQuestion -> {
                 fetchGuessTheCatQuestions()
                 setState { copy(isCorrectAnswer = null) }
+            }
+            // Time Up
+            is GuessTheCatUiEvent.TimeUp -> {
+                // TODO: Handle Time Up
             }
         }
     }

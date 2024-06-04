@@ -1,5 +1,6 @@
 package com.example.catapult.model.quiz.guess_fact
 
+import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.quiz.GuessCatQuestionType
@@ -13,27 +14,40 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactState
+import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
 
 class GuessFactViewModel (
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
     // State
-    private val stateFlow = MutableStateFlow(GuessFactContract.GuessTheFactState())
+    private val stateFlow = MutableStateFlow(GuessTheFactState())
     val state = stateFlow.asStateFlow()
 
-    private fun setState(reducer: GuessFactContract.GuessTheFactState.() -> GuessFactContract.GuessTheFactState) =
+    private fun setState(reducer: GuessTheFactState.() -> GuessTheFactState) =
         stateFlow.getAndUpdate(reducer)
 
     // Event
-    private val eventsFlow = MutableSharedFlow<GuessFactContract.GuessTheFactUiEvent>()
+    private val eventsFlow = MutableSharedFlow<GuessTheFactUiEvent>()
 
-    fun setEvent(event: GuessFactContract.GuessTheFactUiEvent) =
+    fun setEvent(event: GuessTheFactUiEvent) =
         viewModelScope.launch { eventsFlow.emit(event) }
+
+    // Timer
+    private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
+        override fun onTick(millisUntilFinished: Long) {
+            setState { copy(timeLeft = millisUntilFinished / 1000) }
+        }
+        override fun onFinish() {
+            setEvent(GuessTheFactUiEvent.TimeUp)
+        }
+    }
 
     init {
         handleEvents()
         fetchGuessTheFactQuestions()
+        timer.start()
     }
 
     // Events
@@ -48,18 +62,22 @@ class GuessFactViewModel (
         }
     }
 
-    private fun handleEvent(event: GuessFactContract.GuessTheFactUiEvent) {
+    private fun handleEvent(event: GuessTheFactUiEvent) {
         when (event) {
             // Select Fact
-            is GuessFactContract.GuessTheFactUiEvent.SelectFact -> {
+            is GuessTheFactUiEvent.SelectFact -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
-                setEvent(GuessFactContract.GuessTheFactUiEvent.NextQuestion(isCorrect))
+                setEvent(GuessTheFactUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
-            is GuessFactContract.GuessTheFactUiEvent.NextQuestion -> {
+            is GuessTheFactUiEvent.NextQuestion -> {
                 fetchGuessTheFactQuestions()
                 setState { copy(isCorrectAnswer = null) }
+            }
+            // Time Up
+            is GuessTheFactUiEvent.TimeUp -> {
+                // TODO: Handle Time Up
             }
         }
     }

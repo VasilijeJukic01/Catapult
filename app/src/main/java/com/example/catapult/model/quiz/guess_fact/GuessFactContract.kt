@@ -11,12 +11,14 @@ interface GuessFactContract {
         val correctAnswer: Int = -1,
         val totalCorrect: Int = 0,
         val currentQuestionNumber: Int = 0,
-        val isCorrectAnswer: Boolean? = null
+        val isCorrectAnswer: Boolean? = null,
+        val timeLeft: Long = 0L
     )
 
     sealed class GuessTheFactUiEvent{
         data class SelectFact(val index: Int) : GuessTheFactUiEvent()
         data class NextQuestion(val correct: Boolean) : GuessTheFactUiEvent()
+        data object TimeUp : GuessTheFactUiEvent()
     }
 
 }
