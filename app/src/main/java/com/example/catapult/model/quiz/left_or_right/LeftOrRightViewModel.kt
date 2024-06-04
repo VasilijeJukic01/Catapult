@@ -4,7 +4,6 @@ import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.quiz.LeftOrRightQuestionType
-import com.example.catapult.model.quiz.guess_cat.GuessCatContract
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -15,6 +14,7 @@ import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrR
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
 
@@ -22,20 +22,18 @@ class LeftOrRightViewModel (
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
-    // State
     private val stateFlow = MutableStateFlow(LeftOrRightState())
     val state = stateFlow.asStateFlow()
 
     private fun setState(reducer: LeftOrRightState.() -> LeftOrRightState) =
         stateFlow.getAndUpdate(reducer)
 
-    // Event
-    private val eventsFlow = MutableSharedFlow<LeftOrRightUiEvent>()
+    private val _eventsFlow = MutableSharedFlow<LeftOrRightUiEvent>()
+    val eventsFlow = _eventsFlow.asSharedFlow()
 
     fun setEvent(event: LeftOrRightUiEvent) =
-        viewModelScope.launch { eventsFlow.emit(event) }
+        viewModelScope.launch { _eventsFlow.emit(event) }
 
-    // Timer
     private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             setState { copy(timeLeft = millisUntilFinished / 1000) }
@@ -51,7 +49,6 @@ class LeftOrRightViewModel (
         timer.start()
     }
 
-    // Events
     @OptIn(FlowPreview::class)
     private fun handleEvents() {
         viewModelScope.launch {
@@ -65,23 +62,35 @@ class LeftOrRightViewModel (
 
     private fun handleEvent(event: LeftOrRightUiEvent) {
         when (event) {
-            // Select Left or Right
             is LeftOrRightUiEvent.SelectLeftOrRight -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
                 setEvent(LeftOrRightUiEvent.NextQuestion(isCorrect))
             }
-            // Next Question
             is LeftOrRightUiEvent.NextQuestion -> {
-                fetchLeftOrRightQuestions()
-                setState { copy(isCorrectAnswer = null) }
+                if (state.value.currentQuestionNumber >= 20)
+                    endQuiz()
+                else {
+                    fetchLeftOrRightQuestions()
+                    setState { copy(isCorrectAnswer = null) }
+                }
             }
-            // Time Up
             is LeftOrRightUiEvent.TimeUp -> {
-                // TODO: Handle Time Up
+                endQuiz()
             }
+
+            is LeftOrRightUiEvent.EndQuiz -> Unit
         }
     }
+
+    private fun endQuiz() {
+        val stateValue = state.value
+        val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
+        viewModelScope.launch {
+            _eventsFlow.emit(LeftOrRightUiEvent.EndQuiz(totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)))
+        }
+    }
+
 
     private fun fetchLeftOrRightQuestions() {
         viewModelScope.launch {
@@ -95,8 +104,8 @@ class LeftOrRightViewModel (
 
                 val questionType = currentQuestion.questionType
                 val question = when (questionType) {
-                    LeftOrRightQuestionType.WHICH_CAT_IS_HEAVIER -> "Which cat is heavier?"
-                    LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER -> "Which cat lives longer?"
+                    LeftOrRightQuestionType.WHICH_CAT_IS_HEAVIER -> "Which cat is heavier on average?"
+                    LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER -> "Which cat lives longer on average?"
                 }
 
                 setState { copy(
@@ -108,6 +117,4 @@ class LeftOrRightViewModel (
             }
         }
     }
-
-
 }

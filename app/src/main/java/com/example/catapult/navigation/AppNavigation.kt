@@ -14,21 +14,20 @@ import com.example.catapult.ui.compose.breedImagesGrid
 import com.example.catapult.ui.compose.quiz.guessTheCatScreen
 import com.example.catapult.ui.compose.quiz.guessTheFactScreen
 import com.example.catapult.ui.compose.quiz.leftOrRightScreen
+import com.example.catapult.ui.compose.quiz.quizEndScreen
 
 @Composable
 fun AppNavigation() {
-
     val navController = rememberNavController()
 
     NavHost(
         navController = navController,
         startDestination = "choose",
     ) {
-        // Routes
         composable("choose") {
             ChooseScreen(navController = navController)
         }
-        breedsListScreen (
+        breedsListScreen(
             route = "breeds",
             navController = navController,
         )
@@ -71,7 +70,11 @@ fun AppNavigation() {
         )
         leftOrRightScreen(
             route = "leftOrRight",
-            navController = navController,)
+            navController = navController,
+        )
+        quizEndScreen(
+            route = "quizEndScreen",
+            navController = navController,
+        )
     }
-
 }

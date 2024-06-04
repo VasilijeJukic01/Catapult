@@ -16,6 +16,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactState
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
+import kotlinx.coroutines.flow.asSharedFlow
 
 class GuessFactViewModel (
     private val repository: BreedRepository = BreedRepository
@@ -29,10 +30,11 @@ class GuessFactViewModel (
         stateFlow.getAndUpdate(reducer)
 
     // Event
-    private val eventsFlow = MutableSharedFlow<GuessTheFactUiEvent>()
+    private val _eventsFlow = MutableSharedFlow<GuessTheFactUiEvent>()
+    val eventsFlow = _eventsFlow.asSharedFlow()
 
     fun setEvent(event: GuessTheFactUiEvent) =
-        viewModelScope.launch { eventsFlow.emit(event) }
+        viewModelScope.launch { _eventsFlow.emit(event) }
 
     // Timer
     private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
@@ -54,7 +56,7 @@ class GuessFactViewModel (
     @OptIn(FlowPreview::class)
     private fun handleEvents() {
         viewModelScope.launch {
-            eventsFlow
+            _eventsFlow
                 .debounce(300)
                 .collect { event ->
                     handleEvent(event)
@@ -72,13 +74,26 @@ class GuessFactViewModel (
             }
             // Next Question
             is GuessTheFactUiEvent.NextQuestion -> {
-                fetchGuessTheFactQuestions()
-                setState { copy(isCorrectAnswer = null) }
+                if (state.value.currentQuestionNumber >= 20)
+                    endQuiz()
+                else {
+                    fetchGuessTheFactQuestions()
+                    setState { copy(isCorrectAnswer = null) }
+                }
             }
             // Time Up
             is GuessTheFactUiEvent.TimeUp -> {
-                // TODO: Handle Time Up
+                endQuiz()
             }
+            is GuessTheFactUiEvent.EndQuiz -> Unit
+        }
+    }
+
+    private fun endQuiz() {
+        val stateValue = state.value
+        val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
+        viewModelScope.launch {
+            _eventsFlow.emit(GuessTheFactUiEvent.EndQuiz(totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)))
         }
     }
 

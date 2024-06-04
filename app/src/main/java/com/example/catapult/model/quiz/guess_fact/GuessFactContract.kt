@@ -19,6 +19,7 @@ interface GuessFactContract {
         data class SelectFact(val index: Int) : GuessTheFactUiEvent()
         data class NextQuestion(val correct: Boolean) : GuessTheFactUiEvent()
         data object TimeUp : GuessTheFactUiEvent()
+        data class EndQuiz(val totalPoints: Float) : GuessTheFactUiEvent()
     }
 
 }

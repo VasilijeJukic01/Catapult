@@ -18,6 +18,7 @@ interface LeftOrRightContract {
         data class SelectLeftOrRight(val index: Int) : LeftOrRightUiEvent()
         data class NextQuestion(val correct: Boolean) : LeftOrRightUiEvent()
         data object TimeUp : LeftOrRightUiEvent()
+        data class EndQuiz(val totalPoints: Float) : LeftOrRightUiEvent()
     }
 
 }
