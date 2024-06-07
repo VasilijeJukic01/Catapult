@@ -148,7 +148,7 @@ fun ImagePreview(
     modifier: Modifier,
     image: UIBreedImage,
 ) {
-    Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         SubcomposeAsyncImage(
             modifier = Modifier.fillMaxSize(),
             model = image.url,
@@ -163,7 +163,7 @@ fun ImagePreview(
                 }
             },
             contentDescription = null,
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Fit,
         )
     }
 }

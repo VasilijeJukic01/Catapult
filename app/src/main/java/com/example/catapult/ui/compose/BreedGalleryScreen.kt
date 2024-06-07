@@ -10,9 +10,9 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -79,15 +79,14 @@ fun BreedGalleryScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            MediumTopAppBar(
+            TopAppBar(title = {},
+
                 navigationIcon = {
                     AppIconButton(
                         imageVector = Icons.Default.ArrowBack,
                         onClick = onClose,
                     )
-                },
-                title = {}
-            )
+                })
         },
         content = { paddingValues ->
             if (state.images.isNotEmpty()) {

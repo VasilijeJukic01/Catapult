@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -40,6 +39,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract
 import com.example.catapult.model.quiz.guess_fact.GuessFactViewModel
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
@@ -108,14 +108,19 @@ fun GuessTheFactScreen(
                 style = MaterialTheme.typography.titleLarge,
                 modifier = Modifier.padding(bottom = 16.dp)
             )
-            Image(
-                painter = rememberAsyncImagePainter(state.catImage.url),
-                contentDescription = "Cat Image",
+            Box(
                 modifier = Modifier
-                    .size(300.dp)
-                    .aspectRatio(1f)
-                    .padding(bottom = 16.dp)
-            )
+                    .size(200.dp)
+                    .padding(bottom = 16.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                Image(
+                    painter = rememberAsyncImagePainter(state.catImage.url),
+                    contentDescription = "Cat Image",
+                    modifier = Modifier.fillMaxSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
             LazyVerticalGrid(
                 columns = GridCells.Fixed(2),
                 modifier = Modifier
@@ -134,7 +139,7 @@ fun GuessTheFactScreen(
                     ) {
                         Text(
                             text = state.options[index].uppercase(Locale.ROOT),
-                            style = MaterialTheme.typography.titleMedium
+                            style = MaterialTheme.typography.titleSmall
                         )
                     }
                 }
@@ -164,6 +169,7 @@ fun GuessTheFactScreen(
         }
     }
 }
+
 
 
 fun NavGraphBuilder.guessTheFactScreen(

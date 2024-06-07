@@ -11,6 +11,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -21,29 +22,31 @@ import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightViewModel
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeftOrRightScreen(
     state: LeftOrRightContract.LeftOrRightState,
-    leftOrRightViewModel: LeftOrRightViewModel,
     onCatImageClick: (Int) -> Unit,
     onSkipClick: () -> Unit,
     onBackClick: () -> Unit,
-    navController: NavController
+) {
+    LeftOrRightContent(
+        state = state,
+        onCatImageClick = onCatImageClick,
+        onSkipClick = onSkipClick,
+        onBackClick = onBackClick
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun LeftOrRightContent(
+    state: LeftOrRightContract.LeftOrRightState,
+    onCatImageClick: (Int) -> Unit,
+    onSkipClick: () -> Unit,
+    onBackClick: () -> Unit,
 ) {
     val correctColor = Color.Green
     val incorrectColor = Color.Red
-
-    LaunchedEffect(Unit) {
-        leftOrRightViewModel.eventsFlow.collect { event ->
-            when (event) {
-                is LeftOrRightUiEvent.EndQuiz -> {
-                    navController.navigate("quizEndScreen/${event.totalPoints}")
-                }
-                else -> Unit
-            }
-        }
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(
@@ -61,7 +64,9 @@ fun LeftOrRightScreen(
                 }
             )
             Row(
-                modifier = Modifier.fillMaxWidth().padding(16.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -87,14 +92,20 @@ fun LeftOrRightScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 state.catImages.toList().forEachIndexed { index, catImage ->
-                    Image(
-                        painter = rememberAsyncImagePainter(catImage.url),
-                        contentDescription = "Cat Image",
+                    Box(
                         modifier = Modifier
-                            .size(180.dp)
-                            .aspectRatio(1f)
-                            .clickable { onCatImageClick(index) }
-                    )
+                            .size(170.dp)
+                            .clickable { onCatImageClick(index) },
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            painter = rememberAsyncImagePainter(catImage.url),
+                            contentDescription = "Cat Image",
+                            modifier = Modifier
+                                .fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    }
                 }
             }
             Button(onClick = onSkipClick, modifier = Modifier.padding(16.dp)) {
@@ -118,22 +129,27 @@ fun NavGraphBuilder.leftOrRightScreen(
     navController: NavController,
 ) {
     composable(route = route) {
-        val leftOrRightViewModel = viewModel<LeftOrRightViewModel>()
+        val leftOrRightViewModel: LeftOrRightViewModel = viewModel()
         val state by leftOrRightViewModel.state.collectAsState()
+        val navigateToEndQuiz by leftOrRightViewModel.navigateToEndQuiz.collectAsState()
 
         LeftOrRightScreen(
             state = state,
-            leftOrRightViewModel = leftOrRightViewModel,
             onCatImageClick = { index ->
                 leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
             },
             onSkipClick = {
                 leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
-            },
-            onBackClick = {
-                navController.popBackStack()
-            },
-            navController = navController
-        )
+            }
+        ) {
+            navController.popBackStack()
+        }
+
+        LaunchedEffect(navigateToEndQuiz) {
+            navigateToEndQuiz?.let {
+                navController.navigate("quizEndScreen/$it")
+            }
+        }
     }
 }
+

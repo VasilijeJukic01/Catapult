@@ -14,57 +14,61 @@ import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrR
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
 
-class LeftOrRightViewModel (
+@OptIn(FlowPreview::class)
+class LeftOrRightViewModel(
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
     private val stateFlow = MutableStateFlow(LeftOrRightState())
     val state = stateFlow.asStateFlow()
 
+    private val eventsFlow = MutableSharedFlow<LeftOrRightUiEvent>()
+
     private fun setState(reducer: LeftOrRightState.() -> LeftOrRightState) =
         stateFlow.getAndUpdate(reducer)
 
-    private val _eventsFlow = MutableSharedFlow<LeftOrRightUiEvent>()
-    val eventsFlow = _eventsFlow.asSharedFlow()
+    private val _navigateToEndQuiz = MutableStateFlow<Float?>(null)
+    val navigateToEndQuiz = _navigateToEndQuiz.asStateFlow()
 
-    fun setEvent(event: LeftOrRightUiEvent) =
-        viewModelScope.launch { _eventsFlow.emit(event) }
-
-    private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
+    private val timer = object : CountDownTimer(5 * 60 * 1000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             setState { copy(timeLeft = millisUntilFinished / 1000) }
         }
+
         override fun onFinish() {
             setEvent(LeftOrRightUiEvent.TimeUp)
         }
     }
 
     init {
-        handleEvents()
-        fetchLeftOrRightQuestions()
-        timer.start()
-    }
-
-    @OptIn(FlowPreview::class)
-    private fun handleEvents() {
         viewModelScope.launch {
             eventsFlow
                 .debounce(300)
                 .collect { event ->
-                    handleEvent(event)
-                }
+                handleEvent(event)
+            }
         }
+        fetchLeftOrRightQuestions()
+        timer.start()
+    }
+
+    fun setEvent(event: LeftOrRightUiEvent) = viewModelScope.launch {
+        eventsFlow.emit(event)
     }
 
     private fun handleEvent(event: LeftOrRightUiEvent) {
         when (event) {
             is LeftOrRightUiEvent.SelectLeftOrRight -> {
                 val isCorrect = event.index == state.value.correctAnswer
-                setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
+                setState {
+                    copy(
+                        totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect,
+                        isCorrectAnswer = isCorrect
+                    )
+                }
                 setEvent(LeftOrRightUiEvent.NextQuestion(isCorrect))
             }
             is LeftOrRightUiEvent.NextQuestion -> {
@@ -75,10 +79,7 @@ class LeftOrRightViewModel (
                     setState { copy(isCorrectAnswer = null) }
                 }
             }
-            is LeftOrRightUiEvent.TimeUp -> {
-                endQuiz()
-            }
-
+            is LeftOrRightUiEvent.TimeUp -> endQuiz()
             is LeftOrRightUiEvent.EndQuiz -> Unit
         }
     }
@@ -86,11 +87,8 @@ class LeftOrRightViewModel (
     private fun endQuiz() {
         val stateValue = state.value
         val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
-        viewModelScope.launch {
-            _eventsFlow.emit(LeftOrRightUiEvent.EndQuiz(totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)))
-        }
+        _navigateToEndQuiz.value = totalPoints.toFloat().coerceAtMost(100.00f)
     }
-
 
     private fun fetchLeftOrRightQuestions() {
         viewModelScope.launch {
@@ -108,13 +106,16 @@ class LeftOrRightViewModel (
                     LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER -> "Which cat lives longer on average?"
                 }
 
-                setState { copy(
-                    question = question,
-                    catImages = Pair(firstBreedAndImage.second, secondBreedAndImage.second),
-                    correctAnswer = correctAnswer,
-                    currentQuestionNumber = currentQuestionNumber + 1)
+                setState {
+                    copy(
+                        question = question,
+                        catImages = Pair(firstBreedAndImage.second, secondBreedAndImage.second),
+                        correctAnswer = correctAnswer,
+                        currentQuestionNumber = currentQuestionNumber + 1
+                    )
                 }
             }
         }
     }
 }
+

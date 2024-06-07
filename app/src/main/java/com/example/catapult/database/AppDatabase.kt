@@ -15,7 +15,7 @@ import com.example.catapult.database.entities.User
         Breed::class,
         BreedImage::class
     ],
-    version = 7,
+    version = 8,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {
