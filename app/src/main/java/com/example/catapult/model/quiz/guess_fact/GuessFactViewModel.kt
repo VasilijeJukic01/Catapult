@@ -16,7 +16,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactState
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
-import kotlinx.coroutines.flow.asSharedFlow
 
 class GuessFactViewModel (
     private val repository: BreedRepository = BreedRepository
@@ -30,11 +29,9 @@ class GuessFactViewModel (
         stateFlow.getAndUpdate(reducer)
 
     // Event
-    private val _eventsFlow = MutableSharedFlow<GuessTheFactUiEvent>()
-    val eventsFlow = _eventsFlow.asSharedFlow()
+    private val eventsFlow = MutableSharedFlow<GuessTheFactUiEvent>()
 
-    fun setEvent(event: GuessTheFactUiEvent) =
-        viewModelScope.launch { _eventsFlow.emit(event) }
+    fun setEvent(event: GuessTheFactUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }
 
     // Timer
     private val timer = object: CountDownTimer(5 * 60 * 1000, 1000) {
@@ -56,7 +53,7 @@ class GuessFactViewModel (
     @OptIn(FlowPreview::class)
     private fun handleEvents() {
         viewModelScope.launch {
-            _eventsFlow
+            eventsFlow
                 .debounce(300)
                 .collect { event ->
                     handleEvent(event)
@@ -85,6 +82,7 @@ class GuessFactViewModel (
             is GuessTheFactUiEvent.TimeUp -> {
                 endQuiz()
             }
+            // End Quiz
             is GuessTheFactUiEvent.EndQuiz -> Unit
         }
     }
@@ -92,8 +90,11 @@ class GuessFactViewModel (
     private fun endQuiz() {
         val stateValue = state.value
         val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
-        viewModelScope.launch {
-            _eventsFlow.emit(GuessTheFactUiEvent.EndQuiz(totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)))
+        setState {
+            copy(
+                quizEnded = true,
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+            )
         }
     }
 

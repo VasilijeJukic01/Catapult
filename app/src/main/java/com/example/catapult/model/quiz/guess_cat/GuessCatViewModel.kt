@@ -70,13 +70,28 @@ class GuessCatViewModel (
             }
             // Next Question
             is GuessTheCatUiEvent.NextQuestion -> {
-                fetchGuessTheCatQuestions()
-                setState { copy(isCorrectAnswer = null) }
+                if (state.value.currentQuestionNumber >= 20)
+                    endQuiz()
+                else {
+                    fetchGuessTheCatQuestions()
+                    setState { copy(isCorrectAnswer = null) }
+                }
             }
             // Time Up
-            is GuessTheCatUiEvent.TimeUp -> {
-                // TODO: Handle Time Up
-            }
+            is GuessTheCatUiEvent.TimeUp -> endQuiz()
+            // End Quiz
+            is GuessTheCatUiEvent.EndQuiz -> Unit
+        }
+    }
+
+    private fun endQuiz() {
+        val stateValue = state.value
+        val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
+        setState {
+            copy(
+                quizEnded = true,
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+            )
         }
     }
 

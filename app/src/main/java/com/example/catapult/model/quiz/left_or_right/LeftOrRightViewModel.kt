@@ -22,45 +22,47 @@ class LeftOrRightViewModel(
     private val repository: BreedRepository = BreedRepository
 ) : ViewModel() {
 
+    // State
     private val stateFlow = MutableStateFlow(LeftOrRightState())
     val state = stateFlow.asStateFlow()
 
+    private fun setState(reducer: LeftOrRightState.() -> LeftOrRightState) = stateFlow.getAndUpdate(reducer)
+
+    // Event
     private val eventsFlow = MutableSharedFlow<LeftOrRightUiEvent>()
 
-    private fun setState(reducer: LeftOrRightState.() -> LeftOrRightState) =
-        stateFlow.getAndUpdate(reducer)
+    fun setEvent(event: LeftOrRightUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }
 
-    private val _navigateToEndQuiz = MutableStateFlow<Float?>(null)
-    val navigateToEndQuiz = _navigateToEndQuiz.asStateFlow()
-
+    // Timer
     private val timer = object : CountDownTimer(5 * 60 * 1000, 1000) {
         override fun onTick(millisUntilFinished: Long) {
             setState { copy(timeLeft = millisUntilFinished / 1000) }
         }
-
         override fun onFinish() {
             setEvent(LeftOrRightUiEvent.TimeUp)
         }
     }
 
     init {
-        viewModelScope.launch {
-            eventsFlow
-                .debounce(300)
-                .collect { event ->
-                handleEvent(event)
-            }
-        }
+        handleEvents()
         fetchLeftOrRightQuestions()
         timer.start()
     }
 
-    fun setEvent(event: LeftOrRightUiEvent) = viewModelScope.launch {
-        eventsFlow.emit(event)
+    // Events
+    private fun handleEvents() {
+        viewModelScope.launch {
+            eventsFlow
+                .debounce(300)
+                .collect { event ->
+                    handleEvent(event)
+                }
+        }
     }
 
     private fun handleEvent(event: LeftOrRightUiEvent) {
         when (event) {
+            // Select Cat Image
             is LeftOrRightUiEvent.SelectLeftOrRight -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState {
@@ -71,6 +73,7 @@ class LeftOrRightViewModel(
                 }
                 setEvent(LeftOrRightUiEvent.NextQuestion(isCorrect))
             }
+            // Next Question
             is LeftOrRightUiEvent.NextQuestion -> {
                 if (state.value.currentQuestionNumber >= 20)
                     endQuiz()
@@ -79,7 +82,9 @@ class LeftOrRightViewModel(
                     setState { copy(isCorrectAnswer = null) }
                 }
             }
+            // Time Up
             is LeftOrRightUiEvent.TimeUp -> endQuiz()
+            // End Quiz
             is LeftOrRightUiEvent.EndQuiz -> Unit
         }
     }
@@ -87,9 +92,15 @@ class LeftOrRightViewModel(
     private fun endQuiz() {
         val stateValue = state.value
         val totalPoints = stateValue.totalCorrect * 2.5 * (1 + (stateValue.timeLeft + 120) / 300.0)
-        _navigateToEndQuiz.value = totalPoints.toFloat().coerceAtMost(100.00f)
+        setState {
+            copy(
+                quizEnded = true,
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+            )
+        }
     }
 
+    // Fetch
     private fun fetchLeftOrRightQuestions() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

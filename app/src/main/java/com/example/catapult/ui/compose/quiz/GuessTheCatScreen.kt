@@ -156,7 +156,7 @@ fun GuessTheCatScreen(
     }
 }
 
-
+// Navigation
 fun NavGraphBuilder.guessTheCatScreen(
     route: String,
     navController: NavController,
@@ -165,8 +165,8 @@ fun NavGraphBuilder.guessTheCatScreen(
 
     val state by guessCatViewModel.state.collectAsState()
 
-    if (state.timeLeft == 0L) {
-        // TODO: Navigate to Time Up Screen
+    if (state.quizEnded) {
+        navController.navigate("quizEndScreen/${state.totalPoints}")
     }
     else {
         GuessTheCatScreen(

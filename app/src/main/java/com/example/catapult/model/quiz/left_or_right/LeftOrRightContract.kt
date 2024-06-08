@@ -11,7 +11,9 @@ interface LeftOrRightContract {
         val totalCorrect: Int = 0,
         val currentQuestionNumber: Int = 0,
         val isCorrectAnswer: Boolean? = null,
-        val timeLeft: Long = 0L
+        val timeLeft: Long = 0L,
+        val quizEnded: Boolean = false,
+        val totalPoints: Float = 0f
     )
 
     sealed class LeftOrRightUiEvent{

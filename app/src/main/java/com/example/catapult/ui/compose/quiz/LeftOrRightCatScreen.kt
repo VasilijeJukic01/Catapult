@@ -124,30 +124,30 @@ fun LeftOrRightContent(
     }
 }
 
+// Navigation
 fun NavGraphBuilder.leftOrRightScreen(
     route: String,
     navController: NavController,
 ) {
     composable(route = route) {
         val leftOrRightViewModel: LeftOrRightViewModel = viewModel()
+
         val state by leftOrRightViewModel.state.collectAsState()
-        val navigateToEndQuiz by leftOrRightViewModel.navigateToEndQuiz.collectAsState()
 
-        LeftOrRightScreen(
-            state = state,
-            onCatImageClick = { index ->
-                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
-            },
-            onSkipClick = {
-                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
-            }
-        ) {
-            navController.popBackStack()
+        if (state.quizEnded) {
+            navController.navigate("quizEndScreen/${state.totalPoints}")
         }
-
-        LaunchedEffect(navigateToEndQuiz) {
-            navigateToEndQuiz?.let {
-                navController.navigate("quizEndScreen/$it")
+        else {
+            LeftOrRightScreen(
+                state = state,
+                onCatImageClick = { index ->
+                    leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
+                },
+                onSkipClick = {
+                    leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
+                }
+            ) {
+                navController.popBackStack()
             }
         }
     }

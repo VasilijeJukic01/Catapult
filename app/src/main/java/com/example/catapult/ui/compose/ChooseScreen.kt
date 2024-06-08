@@ -1,6 +1,7 @@
 package com.example.catapult.ui.compose
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
@@ -39,23 +41,57 @@ fun ChooseScreen(navController: NavController) {
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Button(
-                onClick = { navController.navigate("breeds") },
-                modifier = Modifier
-                    .padding(8.dp)
-                    .width(160.dp)
-                    .height(60.dp)
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("Catalog", fontSize = 20.sp)
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                        .clickable { navController.navigate("breeds") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.btn1),
+                        contentDescription = "Quiz 1"
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                        .clickable { navController.navigate("guessTheFact") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.btn2),
+                        contentDescription = "Quiz 2"
+                    )
+                }
             }
-            Button(
-                onClick = { navController.navigate("leftOrRight") },
-                modifier = Modifier
-                    .padding(8.dp)
-                    .width(160.dp)
-                    .height(60.dp)
+            Row(
+                horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                Text("Quiz", fontSize = 20.sp)
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                        .clickable { navController.navigate("guessTheCat") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.btn3),
+                        contentDescription = "Quiz 3"
+                    )
+                }
+                Box(
+                    modifier = Modifier
+                        .size(100.dp)
+                        .padding(top = 16.dp)
+                        .clickable { navController.navigate("leftOrRight") }
+                ) {
+                    Image(
+                        painter = painterResource(id = R.drawable.btn4),
+                        contentDescription = "Catalog"
+                    )
+                }
             }
         }
 
