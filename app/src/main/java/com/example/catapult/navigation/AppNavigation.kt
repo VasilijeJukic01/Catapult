@@ -1,5 +1,9 @@
 package com.example.catapult.navigation
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -23,6 +27,10 @@ fun AppNavigation() {
     NavHost(
         navController = navController,
         startDestination = "choose",
+        enterTransition = { slideInHorizontally {it } },
+        exitTransition = { scaleOut (targetScale = 0.75f) },
+        popEnterTransition = { scaleIn(initialScale = 0.75f) },
+        popExitTransition = { slideOutHorizontally { it} },
     ) {
         composable("choose") {
             ChooseScreen(navController = navController)

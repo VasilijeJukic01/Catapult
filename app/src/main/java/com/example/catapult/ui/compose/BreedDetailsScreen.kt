@@ -38,7 +38,6 @@ import com.example.catapult.model.catalog.Characteristics
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.details.BreedDetailsState
 import com.example.catapult.model.catalog.details.BreedDetailsViewModel
-import com.example.catapult.ui.theme.topBarColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,7 +47,7 @@ fun BreedDetailsScreen(
     navController: NavController
 ) {
     Surface {
-        Column (
+        Column(
             modifier = Modifier.fillMaxWidth()
         ) {
             TopAppBar(
@@ -59,7 +58,7 @@ fun BreedDetailsScreen(
                     ) {
                         Text(
                             text = "Details",
-                            color = Color.Black,
+                            color = MaterialTheme.colorScheme.onSecondary,
                             modifier = Modifier.padding(end = 42.dp)
                         )
                     }
@@ -72,9 +71,6 @@ fun BreedDetailsScreen(
                         )
                     }
                 },
-                colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = topBarColor
-                )
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -88,19 +84,23 @@ fun BreedDetailsScreen(
                             .height(4.dp)
                     )
                 }
+
                 (state.error != null) -> {
                     Text(
                         text = "Error: ${state.error}",
                         style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.onSecondary,
                         modifier = Modifier.padding(horizontal = 16.dp)
                     )
                 }
+
                 (state.data != null) -> {
                     BreedDataLazyColumn(
                         data = state.data,
                         navController = navController
                     )
                 }
+
                 else -> {
                     NoDataContent(id = state.breedId)
                 }
@@ -115,16 +115,17 @@ fun BreedDataLazyColumn(
     navController: NavController
 ) {
 
-    val openUrlLauncher = rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) {
-            _ ->
-    }
+    val openUrlLauncher =
+        rememberLauncherForActivityResult(ActivityResultContracts.StartActivityForResult()) { _ ->
+        }
 
     val context = LocalContext.current
     var showToast by remember { mutableStateOf(false) }
 
     LaunchedEffect(showToast) {
         if (showToast) {
-            Toast.makeText(context, "No browser found to open Wikipedia link", Toast.LENGTH_SHORT).show()
+            Toast.makeText(context, "No browser found to open Wikipedia link", Toast.LENGTH_SHORT)
+                .show()
             showToast = false
         }
     }
@@ -134,13 +135,15 @@ fun BreedDataLazyColumn(
             // Name
             Text(
                 style = MaterialTheme.typography.headlineLarge,
+                color = MaterialTheme.colorScheme.onSecondary,
                 text = data.name
             )
 
             // Alt Names
             Text(
                 style = MaterialTheme.typography.bodyLarge.copy(fontStyle = FontStyle.Italic),
-                text = "Also known as: " + data.altNames.joinToString(", ")
+                text = "Also known as: " + data.altNames.joinToString(", "),
+                color = MaterialTheme.colorScheme.onSecondary
             )
             SubcomposeAsyncImage(
                 modifier = Modifier.size(200.dp),
@@ -153,17 +156,23 @@ fun BreedDataLazyColumn(
                 }
             )
             Spacer(modifier = Modifier.height(16.dp))
-            Text(style = MaterialTheme.typography.bodyLarge, text = data.description)
+            Text(
+                style = MaterialTheme.typography.bodyLarge,
+                text = data.description,
+                color = MaterialTheme.colorScheme.onSecondary
+            )
             Spacer(modifier = Modifier.height(16.dp))
 
             // Origin
             Row {
                 Text(
                     text = "Origin: ",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = data.origin,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -173,10 +182,12 @@ fun BreedDataLazyColumn(
             Row {
                 Text(
                     text = "Temperament: ",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = data.temperament.joinToString(", "),
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -186,10 +197,12 @@ fun BreedDataLazyColumn(
             Row {
                 Text(
                     text = "Life Span: ",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = data.lifeSpan,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -199,10 +212,12 @@ fun BreedDataLazyColumn(
             Row {
                 Text(
                     text = "Weight: ",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = data.weight,
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -235,10 +250,12 @@ fun BreedDataLazyColumn(
             Row {
                 Text(
                     text = "Rare: ",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
                     text = if (data.rare == 1) "Yes" else "No",
+                    color = MaterialTheme.colorScheme.onSecondary,
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -255,11 +272,16 @@ fun BreedDataLazyColumn(
                     }
                 },
                 shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
+                    .padding(bottom = 6.dp)
             ) {
-                Text("Open Wikipedia Page")
+                Text(
+                    text = "Open Wikipedia Page",
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
             }
 
             // View Images
@@ -268,11 +290,16 @@ fun BreedDataLazyColumn(
                     navController.navigate("breeds/grid/${data.id}")
                 },
                 shape = RectangleShape,
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
                 modifier = Modifier
                     .fillMaxWidth()
                     .wrapContentWidth(Alignment.CenterHorizontally)
+                    .padding(bottom = 25.dp)
             ) {
-                Text("View Images")
+                Text(
+                    text = "View Images",
+                    color = MaterialTheme.colorScheme.onTertiary
+                )
             }
 
         }

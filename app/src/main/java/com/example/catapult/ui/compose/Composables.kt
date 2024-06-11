@@ -16,6 +16,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -34,7 +35,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.dummies.DataSample
 import com.example.catapult.ui.theme.CatalogTheme
-import com.example.catapult.ui.theme.cardColor
 import androidx.compose.ui.unit.*
 import coil.compose.SubcomposeAsyncImage
 import com.example.catapult.model.catalog.UIBreedImage
@@ -53,7 +53,7 @@ fun BreedCard(
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = cardColor
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         // Name
@@ -64,7 +64,7 @@ fun BreedCard(
                     .padding()
                     .padding(10.dp),
                 textAlign = TextAlign.Left,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -107,7 +107,10 @@ fun BreedCard(
                 SuggestionChip(
                     onClick = {},
                     modifier = Modifier.padding(4.dp),
-                    label  = { Text(temperament) }
+                    label  = { Text(
+                        text = temperament,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    ) }
                 )
             }
         }

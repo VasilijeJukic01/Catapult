@@ -1,5 +1,11 @@
 package com.example.catapult.ui.compose.quiz
 
+import android.annotation.SuppressLint
+import android.content.res.Configuration
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -12,6 +18,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
@@ -37,6 +46,7 @@ fun LeftOrRightScreen(
     )
 }
 
+@SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LeftOrRightContent(
@@ -48,78 +58,210 @@ fun LeftOrRightContent(
     val correctColor = Color.Green
     val incorrectColor = Color.Red
 
-    Box(modifier = Modifier.fillMaxSize()) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 1.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            TopAppBar(
-                title = { Text("Quiz") },
-                navigationIcon = {
-                    IconButton(onClick = onBackClick) {
-                        Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                    }
-                }
-            )
-            Row(
+    val orientation = LocalConfiguration.current.orientation
+
+    Surface(modifier = Modifier.fillMaxSize()) {
+        if (orientation == Configuration.ORIENTATION_PORTRAIT) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(top = 1.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Text(
-                    text = "Question ${state.currentQuestionNumber} of 20",
-                    style = MaterialTheme.typography.bodyMedium
+                TopAppBar(
+                    title = { Text("Quiz") },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
                 )
-                Text(
-                    text = "Total Points: ${state.totalCorrect}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-                Text(
-                    text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
-                    style = MaterialTheme.typography.bodyMedium
-                )
-            }
-            Text(
-                text = state.question,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier.padding(16.dp)
-            )
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                state.catImages.toList().forEachIndexed { index, catImage ->
-                    Box(
-                        modifier = Modifier
-                            .size(170.dp)
-                            .clickable { onCatImageClick(index) },
-                        contentAlignment = Alignment.Center
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = "Question ${state.currentQuestionNumber} of 20",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Total Points: ${state.totalCorrect}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    Text(
+                        text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+                AnimatedContent(
+                    targetState = state.currentQuestionNumber,
+                    transitionSpec = {
+                        slideInHorizontally { it }.togetherWith(slideOutHorizontally { -it })
+                    },
+                    label = "QuestionAnimation"
+                ) {
+                    Text(
+                        text = state.question,
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(24.dp),
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                AnimatedContent(
+                    targetState = state.currentQuestionNumber,
+                    transitionSpec = {
+                        slideInHorizontally { it }.togetherWith(slideOutHorizontally { -it })
+                    },
+                    label = "ImageAnimation"
+                ) {
+
+
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
                     ) {
-                        Image(
-                            painter = rememberAsyncImagePainter(catImage.url),
-                            contentDescription = "Cat Image",
+                        state.catImages.toList().forEachIndexed { index, catImage ->
+                            Box(
+                                modifier = Modifier
+                                    .size(170.dp)
+                                    .clickable { onCatImageClick(index) },
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(catImage.url),
+                                    contentDescription = "Cat Image",
+                                    modifier = Modifier
+                                        .fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                        }
+                    }
+                }
+                Button(
+                    onClick = onSkipClick,
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                    modifier = Modifier.padding(16.dp)
+                ) {
+                    Text("Skip Question")
+
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize(),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.Center
+            ) {
+                TopAppBar(
+                    title = {
+                        Row(
                             modifier = Modifier
-                                .fillMaxSize(),
-                            contentScale = ContentScale.Crop
-                        )
+                                .fillMaxWidth()
+                                .padding(16.dp)
+                                .align(Alignment.CenterHorizontally),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            Text("Menu")
+                            Text(
+                                text = "Question ${state.currentQuestionNumber} of 20",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Total Points: ${state.totalCorrect}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                            Text(
+                                text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+
+                    },
+                    navigationIcon = {
+                        IconButton(onClick = onBackClick) {
+                            Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
+                        }
+                    }
+                )
+                AnimatedContent(
+                    targetState = state.currentQuestionNumber,
+                    transitionSpec = {
+                        slideInHorizontally { it }.togetherWith(slideOutHorizontally { -it })
+                    },
+                    label = "QuestionAnimation"
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Column(
+                            modifier = Modifier.weight(1f),
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            verticalArrangement = Arrangement.Center
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .padding(bottom = 20.dp),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Text(
+                                    text = state.question,
+                                    style = MaterialTheme.typography.titleLarge,
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            Button(
+                                onClick = onSkipClick,
+                                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Text("Skip Question")
+                            }
+                        }
+                        Row(
+                            modifier = Modifier.weight(2f),
+                            horizontalArrangement = Arrangement.SpaceEvenly,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            state.catImages.toList().forEachIndexed { index, catImage ->
+                                Box(
+                                    modifier = Modifier
+                                        .size(200.dp)
+                                        .padding(8.dp)
+                                        .clickable { onCatImageClick(index) },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Image(
+                                        painter = rememberAsyncImagePainter(catImage.url),
+                                        contentDescription = "Cat Image",
+                                        modifier = Modifier
+                                            .fillMaxSize(),
+                                        contentScale = ContentScale.Crop
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
             }
-            Button(onClick = onSkipClick, modifier = Modifier.padding(16.dp)) {
-                Text("Skip Question")
-            }
-        }
 
-        state.isCorrectAnswer?.let { isCorrect ->
-            val color = if (isCorrect) correctColor else incorrectColor
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .background(color.copy(alpha = 0.3f))
-            )
+            state.isCorrectAnswer?.let { isCorrect ->
+                val color = if (isCorrect) correctColor else incorrectColor
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(color.copy(alpha = 0.3f))
+                )
+            }
         }
     }
 }
@@ -136,8 +278,7 @@ fun NavGraphBuilder.leftOrRightScreen(
 
         if (state.quizEnded) {
             navController.navigate("quizEndScreen/${state.totalPoints}")
-        }
-        else {
+        } else {
             LeftOrRightScreen(
                 state = state,
                 onCatImageClick = { index ->
