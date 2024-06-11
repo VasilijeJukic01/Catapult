@@ -20,6 +20,7 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.*
 import androidx.navigation.*
 import androidx.navigation.compose.*
@@ -178,7 +179,7 @@ fun NavGraphBuilder.breedsListScreen(
     navController: NavController,
 ) = composable (route = route) {
 
-    val breedListViewModel = viewModel<BreedListViewModel>()
+    val breedListViewModel = hiltViewModel<BreedListViewModel>()
 
     // Transforms state into state that can be observed by Compose
     val state by breedListViewModel.state.collectAsState()

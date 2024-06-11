@@ -2,13 +2,15 @@ package com.example.catapult.database
 
 import android.content.Context
 import androidx.room.Room
+import dagger.hilt.android.qualifiers.ApplicationContext
+import javax.inject.Inject
 
-object CatapultDatabase {
+class AppDatabaseBuilder @Inject constructor(
+    @ApplicationContext private val context: Context,
+) {
 
-    lateinit var database: AppDatabase
-
-    fun initDatabase(context: Context) {
-        database = Room.databaseBuilder(
+    fun build(): AppDatabase {
+        return Room.databaseBuilder(
             context = context,
             klass = AppDatabase::class.java,
             name = "catapult.db"

@@ -3,17 +3,18 @@ package com.example.catapult.repository
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.api.BreedsApi
-import com.example.catapult.api.networking.retrofit
-import com.example.catapult.database.CatapultDatabase
+import com.example.catapult.database.AppDatabase
 import com.example.catapult.model.quiz.GuessCatQuestion
 import com.example.catapult.model.quiz.LeftOrRightQuestion
 import com.example.catapult.repository.fetchers.BreedFetcher
 import com.example.catapult.repository.fetchers.QuizGenerator
+import javax.inject.Inject
 
-object BreedRepository {
+class BreedRepository @Inject constructor(
+    private val breedsApi: BreedsApi,
+    private val database: AppDatabase
+) {
 
-    private val database by lazy { CatapultDatabase.database }
-    private val breedsApi: BreedsApi by lazy { retrofit.create(BreedsApi::class.java) }
     private val breedFetcher = BreedFetcher(database, breedsApi)
     private val quizGenerator = QuizGenerator(breedFetcher)
 

@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -38,20 +39,7 @@ fun NavGraphBuilder.breedGalleryScreen(
     enterTransition = { slideInVertically { it } },
     popExitTransition = { slideOutVertically { it } },
 ) { navBackStackEntry ->
-    val breedId = navBackStackEntry.arguments?.getString("breedId")
-        ?: throw IllegalStateException("breedId required")
-    val currentImage = navBackStackEntry.arguments?.getString("currentImage")
-        ?: throw IllegalStateException("currentImage required")
-
-    val breedGalleryViewModel = viewModel<BreedGalleryViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BreedGalleryViewModel(breedId = breedId, currentImage = currentImage) as T
-            }
-        }
-    )
-
+    val breedGalleryViewModel = hiltViewModel<BreedGalleryViewModel>(navBackStackEntry)
     val state = breedGalleryViewModel.state.collectAsState()
 
     BreedGalleryScreen(

@@ -27,6 +27,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -326,17 +327,7 @@ fun NavGraphBuilder.breedDetailsScreen(
     route: String,
     navController: NavController,
 ) = composable(route = route) { navBackStackEntry ->
-    val dataId = navBackStackEntry.arguments?.getString("id")
-        ?: throw IllegalArgumentException("id is required.")
-
-    val breedDetailsViewModel = viewModel<BreedDetailsViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                @Suppress("UNCHECKED_CAST")
-                return BreedDetailsViewModel(breedId = dataId) as T
-            }
-        }
-    )
+    val breedDetailsViewModel = hiltViewModel<BreedDetailsViewModel>(navBackStackEntry)
 
     val state = breedDetailsViewModel.state.collectAsState()
 

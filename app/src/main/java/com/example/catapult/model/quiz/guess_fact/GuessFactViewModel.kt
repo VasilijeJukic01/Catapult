@@ -16,9 +16,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactState
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
-class GuessFactViewModel (
-    private val repository: BreedRepository = BreedRepository
+@HiltViewModel
+class GuessFactViewModel @Inject constructor (
+    private val repository: BreedRepository
 ) : ViewModel() {
 
     // State

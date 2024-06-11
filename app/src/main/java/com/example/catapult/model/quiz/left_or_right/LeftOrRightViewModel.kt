@@ -12,14 +12,16 @@ import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightState
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-@OptIn(FlowPreview::class)
-class LeftOrRightViewModel(
-    private val repository: BreedRepository = BreedRepository
+@HiltViewModel
+class LeftOrRightViewModel @Inject constructor(
+    private val repository: BreedRepository
 ) : ViewModel() {
 
     // State

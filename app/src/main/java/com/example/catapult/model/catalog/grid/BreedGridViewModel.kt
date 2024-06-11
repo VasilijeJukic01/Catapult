@@ -1,21 +1,27 @@
 package com.example.catapult.model.catalog.grid
 
 import android.util.Log
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.model.mappers.asViewBreedImage
 import com.example.catapult.repository.BreedRepository
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import javax.inject.Inject
 
-class BreedGridViewModel (
-    private val breedId: String,
-    private val photoRepository: BreedRepository = BreedRepository,
+@HiltViewModel
+class BreedGridViewModel @Inject constructor (
+    savedStateHandle: SavedStateHandle,
+    private val photoRepository: BreedRepository
 ) : ViewModel() {
+
+    private val breedId = savedStateHandle.get<String>("breedId") ?: throw IllegalStateException("breedId required")
 
     // State
     private val stateFlow = MutableStateFlow(BreedGridContract.BreedGridUiState())

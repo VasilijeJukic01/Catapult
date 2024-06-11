@@ -50,6 +50,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract
 import com.example.catapult.model.quiz.guess_fact.GuessFactViewModel
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
@@ -342,7 +343,7 @@ fun NavGraphBuilder.guessTheFactScreen(
     route: String,
     navController: NavController,
 ) = composable(route = route) {
-    val guessFactViewModel = viewModel<GuessFactViewModel>()
+    val guessFactViewModel = hiltViewModel<GuessFactViewModel>()
 
     val state by guessFactViewModel.state.collectAsState()
 

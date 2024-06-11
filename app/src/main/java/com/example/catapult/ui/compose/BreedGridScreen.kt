@@ -23,6 +23,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -45,14 +46,7 @@ fun NavGraphBuilder.breedImagesGrid(
     val breedId = navBackStackEntry.arguments?.getString("breedId")
         ?: throw IllegalStateException("breedId required")
 
-    val breedGridViewModel = viewModel<BreedGridViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BreedGridViewModel(breedId = breedId) as T
-            }
-        }
-    )
+    val breedGridViewModel = hiltViewModel<BreedGridViewModel>(navBackStackEntry)
 
     val onImageClick: (String) -> Unit = { imageId ->
         navController.navigate("breeds/gallery/${breedId}?currentImage=$imageId")
