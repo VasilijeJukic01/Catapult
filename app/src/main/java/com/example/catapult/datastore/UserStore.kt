@@ -31,12 +31,11 @@ class UserStore @Inject constructor(
     }
 
     suspend fun isUserLoggedIn(): Boolean {
-        val userData = getUserData()
-        return userData.firstName.isNotEmpty() && userData.lastName.isNotEmpty() && userData.nickname.isNotEmpty() && userData.email.isNotEmpty()
-    }
-
-    private suspend fun getUserData(): UserData {
-        return persistence.data.first()
+        val userData = persistence.data.first()
+        return userData.firstName.isNotEmpty() &&
+                userData.lastName.isNotEmpty() &&
+                userData.nickname.isNotEmpty() &&
+                userData.email.isNotEmpty()
     }
 
 }

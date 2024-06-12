@@ -19,31 +19,19 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.catapult.datastore.UserStore
-import com.example.catapult.ui.compose.ChooseScreen
-import com.example.catapult.ui.compose.catalog.breedDetailsScreen
-import com.example.catapult.ui.compose.catalog.breedsListScreen
-import com.example.catapult.ui.compose.catalog.breedGalleryScreen
-import com.example.catapult.ui.compose.catalog.breedImagesGrid
 import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
 import com.example.catapult.ui.compose.loginScreen
-import com.example.catapult.ui.compose.quiz.guessTheCatScreen
-import com.example.catapult.ui.compose.quiz.guessTheFactScreen
-import com.example.catapult.ui.compose.quiz.leftOrRightScreen
-import com.example.catapult.ui.compose.quiz.quizEndScreen
+import com.example.catapult.ui.compose.catalog.*
+import com.example.catapult.ui.compose.chooseScreen
+import com.example.catapult.ui.compose.quiz.*
 
 @Composable
 fun AppNavigation(userStore: UserStore) {
     val navController = rememberNavController()
     val startDestination = remember { mutableStateOf("loading") }
 
-    // TODO: Fix architecture
-
     LaunchedEffect(userStore) {
-        if (userStore.isUserLoggedIn()) {
-            startDestination.value = "leaderboard"
-        } else {
-            startDestination.value = "login"
-        }
+        startDestination.value = if (userStore.isUserLoggedIn()) "choose" else "login"
     }
 
     NavHost(
@@ -54,14 +42,15 @@ fun AppNavigation(userStore: UserStore) {
         popEnterTransition = { scaleIn(initialScale = 0.75f) },
         popExitTransition = { slideOutHorizontally { it} },
     ) {
-        composable("loading") {
+        composable(route = "loading") {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                 CircularProgressIndicator()
             }
         }
-        composable("choose") {
-            ChooseScreen(navController = navController)
-        }
+        chooseScreen(
+            route = "choose",
+            navController = navController
+        )
         loginScreen(
             route = "login",
             navController = navController,

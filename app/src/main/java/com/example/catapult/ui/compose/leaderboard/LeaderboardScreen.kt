@@ -27,6 +27,19 @@ import androidx.navigation.compose.composable
 import com.example.catapult.model.leaderboard.LeaderboardContract
 import com.example.catapult.model.leaderboard.LeaderboardViewModel
 
+// TODO: Add back button
+
+// Navigation
+fun NavGraphBuilder.leaderboardScreen(
+    route: String,
+    navController: NavController
+) = composable(route = route) {
+    val viewModel = hiltViewModel<LeaderboardViewModel>()
+    val state by viewModel.state.collectAsState()
+
+    LeaderboardScreen(state, viewModel)
+}
+
 @Composable
 fun LeaderboardScreen(
     state: LeaderboardContract.LeaderboardState,
@@ -38,7 +51,7 @@ fun LeaderboardScreen(
             .padding(16.dp)
     ) {
         Spacer(modifier = Modifier.height(24.dp))
-
+        // Table Header
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -58,9 +71,8 @@ fun LeaderboardScreen(
                 )
             }
         }
-
         Spacer(modifier = Modifier.height(16.dp))
-
+        // Items
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -98,18 +110,5 @@ fun LeaderboardScreen(
                 }
             }
         }
-    }
-}
-
-// Navigation
-fun NavGraphBuilder.leaderboardScreen(
-    route: String,
-    navController: NavController
-) {
-    composable(route = route) {
-        val viewModel = hiltViewModel<LeaderboardViewModel>()
-        val state by viewModel.state.collectAsState()
-
-        LeaderboardScreen(state, viewModel)
     }
 }

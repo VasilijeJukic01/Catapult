@@ -18,6 +18,20 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.compose.material3.Surface
 
+// TODO: Add submit button logic
+
+// Navigation
+fun NavGraphBuilder.quizEndScreen(
+    route: String,
+    navController: NavController,
+) = composable(route = "$route/{totalPoints}") { backStackEntry ->
+    val totalPoints = backStackEntry.arguments?.getString("totalPoints")?.toFloat() ?: 0.0f
+    QuizEndScreen(
+        totalScore = totalPoints,
+        onHomeClick = { navController.navigate("choose") { popUpTo("choose") { inclusive = true } } }
+    )
+}
+
 @Composable
 fun QuizEndScreen(
     totalScore: Float,
@@ -48,17 +62,5 @@ fun QuizEndScreen(
                 Text("Home")
             }
         }
-    }
-}
-fun NavGraphBuilder.quizEndScreen(
-    route: String,
-    navController: NavController,
-) {
-    composable(route = "$route/{totalPoints}") { backStackEntry ->
-        val totalPoints = backStackEntry.arguments?.getString("totalPoints")?.toFloat() ?: 0.0f
-        QuizEndScreen(
-            totalScore = totalPoints,
-            onHomeClick = { navController.navigate("choose") { popUpTo("choose") { inclusive = true } } }
-        )
     }
 }

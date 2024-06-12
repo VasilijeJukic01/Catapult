@@ -55,6 +55,32 @@ import com.example.catapult.model.quiz.guess_fact.GuessFactViewModel
 import com.example.catapult.model.quiz.guess_fact.GuessFactContract.GuessTheFactUiEvent
 import java.util.Locale
 
+// Navigation
+fun NavGraphBuilder.guessTheFactScreen(
+    route: String,
+    navController: NavController,
+) = composable(route = route) {
+    val guessFactViewModel = hiltViewModel<GuessFactViewModel>()
+    val state by guessFactViewModel.state.collectAsState()
+
+    if (state.quizEnded) {
+        navController.navigate("quizEndScreen/${state.totalPoints}")
+    } else {
+        GuessTheFactScreen(
+            state = state,
+            onFactOptionClick = { index ->
+                guessFactViewModel.setEvent(GuessTheFactUiEvent.SelectFact(index))
+            },
+            onSkipClick = {
+                guessFactViewModel.setEvent(GuessTheFactUiEvent.NextQuestion(false))
+            },
+            onBackClick = {
+                navController.popBackStack()
+            },
+        )
+    }
+}
+
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -322,6 +348,7 @@ fun GuessTheFactScreen(
             }
         }
 
+        // Animation Light
         state.isCorrectAnswer?.let { isCorrect ->
             val color = if (isCorrect) correctColor else incorrectColor
             Box(
@@ -336,33 +363,5 @@ fun GuessTheFactScreen(
                     )
             )
         }
-    }
-}
-
-
-// Navigation
-fun NavGraphBuilder.guessTheFactScreen(
-    route: String,
-    navController: NavController,
-) = composable(route = route) {
-    val guessFactViewModel = hiltViewModel<GuessFactViewModel>()
-
-    val state by guessFactViewModel.state.collectAsState()
-
-    if (state.quizEnded) {
-        navController.navigate("quizEndScreen/${state.totalPoints}")
-    } else {
-        GuessTheFactScreen(
-            state = state,
-            onFactOptionClick = { index ->
-                guessFactViewModel.setEvent(GuessTheFactUiEvent.SelectFact(index))
-            },
-            onSkipClick = {
-                guessFactViewModel.setEvent(GuessTheFactUiEvent.NextQuestion(false))
-            },
-            onBackClick = {
-                navController.popBackStack()
-            },
-        )
     }
 }

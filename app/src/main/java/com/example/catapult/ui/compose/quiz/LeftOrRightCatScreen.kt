@@ -2,7 +2,6 @@ package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
-import android.util.Log
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -34,6 +33,31 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightViewModel
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
+
+// Navigation
+fun NavGraphBuilder.leftOrRightScreen(
+    route: String,
+    navController: NavController,
+) = composable(route = route) {
+    val leftOrRightViewModel: LeftOrRightViewModel = hiltViewModel()
+    val state by leftOrRightViewModel.state.collectAsState()
+
+    if (state.quizEnded) {
+        navController.navigate("quizEndScreen/${state.totalPoints}")
+    } else {
+        LeftOrRightScreen(
+            state = state,
+            onCatImageClick = { index ->
+                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
+            },
+            onSkipClick = {
+                leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
+            }
+        ) {
+            navController.popBackStack()
+        }
+    }
+}
 
 @Composable
 fun LeftOrRightScreen(
@@ -262,6 +286,7 @@ fun LeftOrRightContent(
             }
         }
 
+        // Animation Light
         state.isCorrectAnswer?.let { isCorrect ->
             val color = if (isCorrect) correctColor else incorrectColor
             Box(
@@ -275,36 +300,6 @@ fun LeftOrRightContent(
                         )
                     )
             )
-            Log.d("LeftOrRightScreen", "isCorrectAnswer: $isCorrect")
         }
     }
 }
-
-// Navigation
-fun NavGraphBuilder.leftOrRightScreen(
-    route: String,
-    navController: NavController,
-) {
-    composable(route = route) {
-        val leftOrRightViewModel: LeftOrRightViewModel = hiltViewModel()
-
-        val state by leftOrRightViewModel.state.collectAsState()
-
-        if (state.quizEnded) {
-            navController.navigate("quizEndScreen/${state.totalPoints}")
-        } else {
-            LeftOrRightScreen(
-                state = state,
-                onCatImageClick = { index ->
-                    leftOrRightViewModel.setEvent(LeftOrRightUiEvent.SelectLeftOrRight(index))
-                },
-                onSkipClick = {
-                    leftOrRightViewModel.setEvent(LeftOrRightUiEvent.NextQuestion(false))
-                }
-            ) {
-                navController.popBackStack()
-            }
-        }
-    }
-}
-

@@ -9,6 +9,7 @@ class AppDatabaseBuilder @Inject constructor(
     @ApplicationContext private val context: Context,
 ) {
 
+    // Builder
     fun build(): AppDatabase {
         return Room.databaseBuilder(
             context = context,

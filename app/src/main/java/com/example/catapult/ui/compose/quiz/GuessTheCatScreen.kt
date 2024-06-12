@@ -57,6 +57,32 @@ import com.example.catapult.model.quiz.guess_cat.GuessCatContract
 import com.example.catapult.model.quiz.guess_cat.GuessCatViewModel
 import com.example.catapult.model.quiz.guess_cat.GuessCatContract.GuessTheCatUiEvent
 
+// Navigation
+fun NavGraphBuilder.guessTheCatScreen(
+    route: String,
+    navController: NavController,
+) = composable(route = route) {
+    val guessCatViewModel = hiltViewModel<GuessCatViewModel>()
+    val state by guessCatViewModel.state.collectAsState()
+
+    if (state.quizEnded) {
+        navController.navigate("quizEndScreen/${state.totalPoints}")
+    } else {
+        GuessTheCatScreen(
+            state = state,
+            onCatImageClick = { index ->
+                guessCatViewModel.setEvent(GuessTheCatUiEvent.SelectCatImage(index))
+            },
+            onSkipClick = {
+                guessCatViewModel.setEvent(GuessTheCatUiEvent.NextQuestion(false))
+            },
+            onBackClick = {
+                navController.popBackStack()
+            }
+        )
+    }
+}
+
 @SuppressLint("UnusedContentLambdaTargetStateParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -274,6 +300,7 @@ fun GuessTheCatScreen(
             }
         }
 
+        // Animation Light
         state.isCorrectAnswer?.let { isCorrect ->
             val color = if (isCorrect) correctColor else incorrectColor
             Box(
@@ -288,33 +315,6 @@ fun GuessTheCatScreen(
                     )
             )
         }
-    }
-}
-
-// Navigation
-fun NavGraphBuilder.guessTheCatScreen(
-    route: String,
-    navController: NavController,
-) = composable(route = route) {
-    val guessCatViewModel = hiltViewModel<GuessCatViewModel>()
-
-    val state by guessCatViewModel.state.collectAsState()
-
-    if (state.quizEnded) {
-        navController.navigate("quizEndScreen/${state.totalPoints}")
-    } else {
-        GuessTheCatScreen(
-            state = state,
-            onCatImageClick = { index ->
-                guessCatViewModel.setEvent(GuessTheCatUiEvent.SelectCatImage(index))
-            },
-            onSkipClick = {
-                guessCatViewModel.setEvent(GuessTheCatUiEvent.NextQuestion(false))
-            },
-            onBackClick = {
-                navController.popBackStack()
-            }
-        )
     }
 }
 

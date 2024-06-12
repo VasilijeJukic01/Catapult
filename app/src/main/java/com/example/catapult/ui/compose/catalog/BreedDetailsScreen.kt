@@ -37,6 +37,23 @@ import com.example.catapult.model.catalog.details.BreedDetailsState
 import com.example.catapult.model.catalog.details.BreedDetailsViewModel
 import com.example.catapult.ui.compose.NoDataContent
 
+// Navigation
+fun NavGraphBuilder.breedDetailsScreen(
+    route: String,
+    navController: NavController,
+) = composable(route = route) { navBackStackEntry ->
+    val breedDetailsViewModel = hiltViewModel<BreedDetailsViewModel>(navBackStackEntry)
+    val state = breedDetailsViewModel.state.collectAsState()
+
+    BreedDetailsScreen(
+        state = state.value,
+        onBackClick = {
+            navController.popBackStack()
+        },
+        navController = navController
+    )
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BreedDetailsScreen(
@@ -317,24 +334,6 @@ fun BreedCharacteristicBar(characteristicName: String, characteristicValue: Int)
         )
         Spacer(modifier = Modifier.height(8.dp))
     }
-}
-
-// Navigation
-fun NavGraphBuilder.breedDetailsScreen(
-    route: String,
-    navController: NavController,
-) = composable(route = route) { navBackStackEntry ->
-    val breedDetailsViewModel = hiltViewModel<BreedDetailsViewModel>(navBackStackEntry)
-
-    val state = breedDetailsViewModel.state.collectAsState()
-
-    BreedDetailsScreen(
-        state = state.value,
-        onBackClick = {
-            navController.popBackStack()
-        },
-        navController = navController
-    )
 }
 
 // Preview
