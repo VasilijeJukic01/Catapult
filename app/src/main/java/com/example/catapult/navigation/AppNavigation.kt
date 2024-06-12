@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavType
@@ -25,6 +24,7 @@ import com.example.catapult.ui.compose.catalog.breedDetailsScreen
 import com.example.catapult.ui.compose.catalog.breedsListScreen
 import com.example.catapult.ui.compose.catalog.breedGalleryScreen
 import com.example.catapult.ui.compose.catalog.breedImagesGrid
+import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
 import com.example.catapult.ui.compose.loginScreen
 import com.example.catapult.ui.compose.quiz.guessTheCatScreen
 import com.example.catapult.ui.compose.quiz.guessTheFactScreen
@@ -40,7 +40,7 @@ fun AppNavigation(userStore: UserStore) {
 
     LaunchedEffect(userStore) {
         if (userStore.isUserLoggedIn()) {
-            startDestination.value = "choose"
+            startDestination.value = "leaderboard"
         } else {
             startDestination.value = "login"
         }
@@ -113,6 +113,10 @@ fun AppNavigation(userStore: UserStore) {
         )
         quizEndScreen(
             route = "quizEndScreen",
+            navController = navController,
+        )
+        leaderboardScreen(
+            route = "leaderboard",
             navController = navController,
         )
     }
