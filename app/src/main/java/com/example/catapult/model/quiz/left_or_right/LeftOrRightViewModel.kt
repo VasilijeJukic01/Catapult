@@ -52,6 +52,7 @@ class LeftOrRightViewModel @Inject constructor(
     }
 
     // Events
+    @OptIn(FlowPreview::class)
     private fun handleEvents() {
         viewModelScope.launch {
             eventsFlow

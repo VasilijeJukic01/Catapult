@@ -36,7 +36,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -71,6 +70,7 @@ fun GuessTheFactScreen(
     val orientation = LocalConfiguration.current.orientation
 
     Surface(modifier = Modifier.fillMaxSize()) {
+        // Portrait
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             Column(
                 modifier = Modifier
@@ -191,7 +191,9 @@ fun GuessTheFactScreen(
                     Text("Skip Question")
                 }
             }
-        } else {
+        }
+        // Landscape
+        else {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),

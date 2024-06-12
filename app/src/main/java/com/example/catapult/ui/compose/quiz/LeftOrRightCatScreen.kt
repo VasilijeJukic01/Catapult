@@ -2,7 +2,11 @@ package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import android.util.Log
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.core.LinearOutSlowInEasing
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -23,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -62,6 +65,7 @@ fun LeftOrRightContent(
     val orientation = LocalConfiguration.current.orientation
 
     Surface(modifier = Modifier.fillMaxSize()) {
+        // Portrait
         if (orientation == Configuration.ORIENTATION_PORTRAIT) {
             Column(
                 modifier = Modifier
@@ -151,7 +155,9 @@ fun LeftOrRightContent(
 
                 }
             }
-        } else {
+        }
+        // Landscape
+        else {
             Column(
                 modifier = Modifier
                     .fillMaxSize(),
@@ -254,15 +260,22 @@ fun LeftOrRightContent(
                     }
                 }
             }
+        }
 
-            state.isCorrectAnswer?.let { isCorrect ->
-                val color = if (isCorrect) correctColor else incorrectColor
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(color.copy(alpha = 0.3f))
-                )
-            }
+        state.isCorrectAnswer?.let { isCorrect ->
+            val color = if (isCorrect) correctColor else incorrectColor
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color.copy(alpha = 0.3f))
+                    .animateContentSize(
+                        animationSpec = tween(
+                            durationMillis = 300,
+                            easing = LinearOutSlowInEasing
+                        )
+                    )
+            )
+            Log.d("LeftOrRightScreen", "isCorrectAnswer: $isCorrect")
         }
     }
 }

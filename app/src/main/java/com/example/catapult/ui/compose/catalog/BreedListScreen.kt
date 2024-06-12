@@ -1,4 +1,4 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -21,7 +21,6 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.*
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.example.catapult.R
@@ -30,6 +29,7 @@ import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListState
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListUiEvent
 import com.example.catapult.model.catalog.list.BreedListViewModel
+import com.example.catapult.ui.compose.BreedCard
 import com.example.catapult.ui.theme.*
 
 @ExperimentalMaterial3Api

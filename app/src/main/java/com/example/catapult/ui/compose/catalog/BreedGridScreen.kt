@@ -1,4 +1,4 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
@@ -24,9 +24,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
@@ -35,6 +32,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.model.catalog.grid.BreedGridContract
 import com.example.catapult.model.catalog.grid.BreedGridViewModel
+import com.example.catapult.ui.compose.AppIconButton
 
 // Navigation
 fun NavGraphBuilder.breedImagesGrid(

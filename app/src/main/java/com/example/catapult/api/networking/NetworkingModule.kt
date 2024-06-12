@@ -1,5 +1,6 @@
 package com.example.catapult.api.networking
 
+import com.example.catapult.api.networking.url_providers.BreedsApiUrl
 import com.example.catapult.api.networking.url_providers.LeaderboardApiUrl
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import dagger.Module
@@ -40,9 +41,9 @@ object NetworkingModule {
     @Singleton
     @Provides
     @Named("BreedApiRetrofit")
-    fun provideBreedApiRetrofit(okHttpClient: OkHttpClient): Retrofit {
+    fun provideBreedApiRetrofit(okHttpClient: OkHttpClient, @BreedsApiUrl baseUrl: String): Retrofit {
         return Retrofit.Builder()
-            .baseUrl("https://api.thecatapi.com/v1/")
+            .baseUrl(baseUrl)
             .client(okHttpClient)
             .addConverterFactory(AppJson.asConverterFactory("application/json".toMediaType()))
             .build()

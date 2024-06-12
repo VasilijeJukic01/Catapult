@@ -18,5 +18,4 @@ object BreedRetrofitModule {
     @Singleton
     fun provideBreedRetrofit(@Named("BreedApiRetrofit") retrofit: Retrofit): BreedsApi = retrofit.create()
 
-
 }

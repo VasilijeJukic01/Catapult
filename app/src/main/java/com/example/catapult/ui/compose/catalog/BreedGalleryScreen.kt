@@ -1,4 +1,4 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -19,14 +19,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.catapult.model.catalog.gallery.BreedGalleryContract
 import com.example.catapult.model.catalog.gallery.BreedGalleryViewModel
+import com.example.catapult.ui.compose.AppIconButton
+import com.example.catapult.ui.compose.ImagePreview
 
 // Navigation
 fun NavGraphBuilder.breedGalleryScreen(

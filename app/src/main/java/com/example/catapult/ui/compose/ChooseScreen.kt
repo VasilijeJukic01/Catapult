@@ -7,12 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -52,7 +48,7 @@ fun ChooseScreen(navController: NavController) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.btn1),
-                        contentDescription = "Quiz 1"
+                        contentDescription = "Catalog"
                     )
                 }
                 Box(
@@ -63,7 +59,7 @@ fun ChooseScreen(navController: NavController) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.btn2),
-                        contentDescription = "Quiz 2"
+                        contentDescription = "Quiz 1"
                     )
                 }
             }
@@ -78,7 +74,7 @@ fun ChooseScreen(navController: NavController) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.btn3),
-                        contentDescription = "Quiz 3"
+                        contentDescription = "Quiz 2"
                     )
                 }
                 Box(
@@ -89,7 +85,7 @@ fun ChooseScreen(navController: NavController) {
                 ) {
                     Image(
                         painter = painterResource(id = R.drawable.btn4),
-                        contentDescription = "Catalog"
+                        contentDescription = "Quiz 3"
                     )
                 }
             }
