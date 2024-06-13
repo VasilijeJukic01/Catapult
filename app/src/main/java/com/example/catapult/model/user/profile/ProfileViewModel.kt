@@ -7,12 +7,14 @@ import com.example.catapult.datastore.UserData
 import com.example.catapult.model.user.profile.ProfileContract.*
 import com.example.catapult.repository.LeaderboardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,8 +22,9 @@ class ProfileViewModel @Inject constructor(
     private val repository: LeaderboardRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
-    val currentUser: UserData =
-        savedStateHandle["user"] ?: throw IllegalStateException("User data missing")
+
+    private val currentUser: UserData = savedStateHandle.get<String>("user")?.let {
+        Json.decodeFromString<UserData>(it) } ?: throw IllegalStateException("User data missing")
 
     // State
     private val stateFlow = MutableStateFlow(ProfileState())
@@ -36,10 +39,10 @@ class ProfileViewModel @Inject constructor(
 
     init {
         handleEvents()
+        fetchResults()
     }
 
     // Events
-    @OptIn(FlowPreview::class)
     private fun handleEvents() {
         viewModelScope.launch {
             eventsFlow
@@ -53,6 +56,15 @@ class ProfileViewModel @Inject constructor(
         when (event) {
             is ProfileUiEvent.OnLeaderBoardClick -> Unit
             is ProfileUiEvent.OnMyResultsClick -> Unit
+        }
+    }
+
+    // Fetch
+    private fun fetchResults() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                // TODO: Fetch user results
+            }
         }
     }
 

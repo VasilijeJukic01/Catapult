@@ -22,11 +22,13 @@ class UserDrawerViewModel @Inject constructor(
     private val userStore: UserStore,
 ) : ViewModel() {
 
+    // State
     private val _state = MutableStateFlow(DrawerUiState())
     val state = _state.asStateFlow()
 
     private fun setState(reducer: DrawerUiState.() -> DrawerUiState) = _state.update(reducer)
 
+    // Events
     private val eventsFlow = MutableSharedFlow<DrawerUiEvent>()
 
     fun setEvent(event: DrawerUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }

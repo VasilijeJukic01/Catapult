@@ -1,7 +1,6 @@
 package com.example.catapult.ui.compose.user
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -17,24 +16,43 @@ import androidx.navigation.compose.composable
 import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import androidx.navigation.NamedNavArgument
+import com.example.catapult.datastore.UserData
 import com.example.catapult.model.user.edit.EditUserViewModel
+import kotlinx.serialization.json.Json
 
 // Navigation
 fun NavGraphBuilder.editUserScreen(
     route: String,
+    arguments: List<NamedNavArgument>,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    arguments = arguments
+) {backStackEntry ->
+    val userJson = backStackEntry.arguments?.getString("user")
+    val user = Json.decodeFromString<UserData>(userJson ?: "")
+
     val editUserViewModel = hiltViewModel<EditUserViewModel>()
-    EditUserScreen(viewModel = editUserViewModel)
+
+    EditUserScreen(
+        viewModel = editUserViewModel,
+        user = user,
+        navController = navController
+    )
 }
 
 @Composable
-fun EditUserScreen(viewModel: EditUserViewModel) {
+fun EditUserScreen(
+    viewModel: EditUserViewModel,
+    user: UserData,
+    navController: NavController
+) {
+    var firstName by remember { mutableStateOf(user.firstName) }
+    var lastName by remember { mutableStateOf(user.lastName) }
+    var nickname by remember { mutableStateOf(user.nickname) }
+    var email by remember { mutableStateOf(user.email) }
 
-    var firstName by remember { mutableStateOf("") }
-    var lastName by remember { mutableStateOf("") }
-    var nickname by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
 
     // Regex
     val emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
@@ -58,7 +76,7 @@ fun EditUserScreen(viewModel: EditUserViewModel) {
                 verticalArrangement = Arrangement.Center
             ) {
                 Text(
-                    text = "Edit User",
+                    text = "Edit Profile",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
@@ -179,7 +197,8 @@ fun EditUserScreen(viewModel: EditUserViewModel) {
                 Button(
                     onClick = {
                         if (!isEmailError && !isNicknameError) {
-                            viewModel.setEvent(OnSubmitClick(firstName, lastName, nickname, email))
+                            viewModel.setEvent(OnSubmitClick("", firstName, lastName, nickname, email))
+                            navController.navigate("choose")
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inversePrimary),
