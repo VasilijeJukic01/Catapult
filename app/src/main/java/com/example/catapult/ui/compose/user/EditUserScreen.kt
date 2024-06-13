@@ -1,6 +1,5 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.user
 
-import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -10,37 +9,27 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.catapult.R
-import com.example.catapult.model.user.login.LoginViewModel
-import com.example.catapult.model.user.login.LoginContract.LoginUiEvent.OnLoginClick
+import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import com.example.catapult.model.user.edit.EditUserViewModel
 
 // Navigation
-fun NavGraphBuilder.loginScreen(
+fun NavGraphBuilder.editUserScreen(
     route: String,
     navController: NavController,
 ) = composable(route = route) {
-    val loginViewModel = hiltViewModel<LoginViewModel>()
-    val state by loginViewModel.state.collectAsState()
-
-    if (state.isLoggedIn) {
-        navController.navigate("choose")
-    } else {
-        LoginScreen(viewModel = loginViewModel)
-    }
+    val editUserViewModel = hiltViewModel<EditUserViewModel>()
+    EditUserScreen(viewModel = editUserViewModel)
 }
 
 @Composable
-fun LoginScreen(viewModel: LoginViewModel) {
-    val image = painterResource(id = R.drawable.background)
+fun EditUserScreen(viewModel: EditUserViewModel) {
 
     var firstName by remember { mutableStateOf("") }
     var lastName by remember { mutableStateOf("") }
@@ -58,13 +47,6 @@ fun LoginScreen(viewModel: LoginViewModel) {
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        // Background
-        Image(
-            painter = image,
-            contentDescription = null,
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.FillBounds
-        )
         // Form Surface
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -75,12 +57,12 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
-                // First Name
                 Text(
-                    text = "Login",
+                    text = "Edit User",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
+                // First Name
                 TextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -197,14 +179,14 @@ fun LoginScreen(viewModel: LoginViewModel) {
                 Button(
                     onClick = {
                         if (!isEmailError && !isNicknameError) {
-                            viewModel.setEvent(OnLoginClick(firstName, lastName, nickname, email))
+                            viewModel.setEvent(OnSubmitClick(firstName, lastName, nickname, email))
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inversePrimary),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Login",
+                        text = "Submit",
                         color = Color.White,
                     )
                 }

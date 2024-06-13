@@ -4,9 +4,12 @@ import android.util.Log
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -28,6 +31,19 @@ class UserStore @Inject constructor(
     suspend fun updateUserData(newUserData: UserData) {
         persistence.updateData { newUserData }
         Log.d("AuthStore", "Data updated: $newUserData")
+    }
+
+    suspend fun getUser(): UserData {
+        return persistence.data.first()
+    }
+
+    fun getAllUsers(): Flow<List<UserData>> {
+        return persistence.data.map { listOf(it) }
+    }
+
+    suspend fun deleteUser() {
+        Log.d("AuthStore", "Data deleted")
+        persistence.updateData { UserData() }
     }
 
     suspend fun isUserLoggedIn(): Boolean {

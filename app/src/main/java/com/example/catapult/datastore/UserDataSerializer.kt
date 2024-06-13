@@ -10,7 +10,7 @@ import java.io.OutputStream
 
 class UserDataSerializer : Serializer<UserData> {
 
-    override val defaultValue: UserData = UserData("","","","")
+    override val defaultValue: UserData = UserData("","","","", "")
 
     override suspend fun readFrom(input: InputStream): UserData {
         return withContext(Dispatchers.IO) {

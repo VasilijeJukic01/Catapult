@@ -1,4 +1,4 @@
-package com.example.catapult.model.user
+package com.example.catapult.model.user.login
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -13,8 +13,8 @@ import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import com.example.catapult.model.user.LoginContract.LoginUiEvent
-import com.example.catapult.model.user.LoginContract.LoginState
+import com.example.catapult.model.user.login.LoginContract.LoginUiEvent
+import com.example.catapult.model.user.login.LoginContract.LoginState
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -53,7 +53,7 @@ class LoginViewModel @Inject constructor(
             // Login
             is LoginUiEvent.OnLoginClick -> {
                 setState { copy(isLoading = true) }
-                val user = UserData(event.firstName, event.lastName, event.nickname, event.emails)
+                val user = UserData("", event.firstName, event.lastName, event.nickname, event.emails)
                 store.updateUserData(user)
                 setState { copy(isLoading = false, isLoggedIn = true) }
             }

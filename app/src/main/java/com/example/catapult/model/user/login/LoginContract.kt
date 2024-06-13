@@ -1,4 +1,4 @@
-package com.example.catapult.model.user
+package com.example.catapult.model.user.login
 
 interface LoginContract {
 

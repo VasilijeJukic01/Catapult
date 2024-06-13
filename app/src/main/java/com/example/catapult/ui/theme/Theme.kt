@@ -13,7 +13,9 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = Pink80,
     onPrimary = Purple40,
     onTertiary = Color.Black,
-    onSecondary = Color.White
+    onSecondary = Color.White,
+    inversePrimary = Purple40,
+    error = Error
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -22,8 +24,9 @@ private val LightColorScheme = lightColorScheme(
     tertiary = Pink40,
     onPrimary = Color.White,
     onTertiary = Color.White,
-    onSecondary = Color.Black
-
+    onSecondary = Color.Black,
+    inversePrimary = Purple40,
+    error = Error
 )
 
 @Composable

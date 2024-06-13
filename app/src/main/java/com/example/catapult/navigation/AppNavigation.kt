@@ -1,5 +1,6 @@
 package com.example.catapult.navigation
 
+import ProfileScreen
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
@@ -18,12 +19,16 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.catapult.datastore.UserData
 import com.example.catapult.datastore.UserStore
 import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
 import com.example.catapult.ui.compose.loginScreen
 import com.example.catapult.ui.compose.catalog.*
 import com.example.catapult.ui.compose.chooseScreen
 import com.example.catapult.ui.compose.quiz.*
+import com.example.catapult.ui.compose.user.EditUserScreen
+import com.example.catapult.ui.compose.user.editUserScreen
+import kotlinx.serialization.json.Json
 
 @Composable
 fun AppNavigation(userStore: UserStore) {
@@ -37,10 +42,10 @@ fun AppNavigation(userStore: UserStore) {
     NavHost(
         navController = navController,
         startDestination = startDestination.value,
-        enterTransition = { slideInHorizontally {it } },
-        exitTransition = { scaleOut (targetScale = 0.75f) },
-        popEnterTransition = { scaleIn(initialScale = 0.75f) },
-        popExitTransition = { slideOutHorizontally { it} },
+     //   enterTransition = { slideInHorizontally {it } },
+      //  exitTransition = { scaleOut (targetScale = 0.75f) },
+       // popEnterTransition = { scaleIn(initialScale = 0.75f) },
+      //  popExitTransition = { slideOutHorizontally { it} },
     ) {
         composable(route = "loading") {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
@@ -108,5 +113,18 @@ fun AppNavigation(userStore: UserStore) {
             route = "leaderboard",
             navController = navController,
         )
+        composable(
+            route = "profile/{user}",
+            arguments = listOf(navArgument("user") { type = NavType.StringType })
+        ) { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("user")
+            val user = Json.decodeFromString<UserData>(userJson ?: "")
+            ProfileScreen(user = user)
+        }
+        composable("editUser/{userJson}") { backStackEntry ->
+            val userJson = backStackEntry.arguments?.getString("userJson")
+            val user = Json.decodeFromString<UserData>(userJson ?: "")
+            editUserScreen(route = "editUser/$user", navController = navController)
+        }
     }
 }
