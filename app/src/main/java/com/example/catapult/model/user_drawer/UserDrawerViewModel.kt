@@ -13,8 +13,6 @@ import javax.inject.Inject
 import com.example.catapult.model.user_drawer.UserDrawerContract.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.toList
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 

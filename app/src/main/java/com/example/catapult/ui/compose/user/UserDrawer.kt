@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import androidx.compose.foundation.layout.*
+import androidx.compose.material.icons.filled.Star
 
 @Composable
 fun UserDrawer(
@@ -65,6 +66,9 @@ fun UserDrawer(
                 }
                 is UserDrawerDestination.AddProfile -> {
                     navController.navigate("addUser")
+                }
+                is UserDrawerDestination.Leaderboard -> {
+                    navController.navigate("leaderboard")
                 }
             }
             onDrawerDestinationClick(it)
@@ -142,6 +146,12 @@ fun AppDrawer(
                         icon = Icons.Default.Edit,
                         text = "Edit Profile",
                         onClick = { onDrawerDestinationClick(UserDrawerDestination.EditProfile(state.currentAccount)) },
+                    )
+
+                    AppDrawerActionItem(
+                        icon = Icons.Default.Star,
+                        text = "Leaderboard",
+                        onClick = { onDrawerDestinationClick(UserDrawerDestination.Leaderboard) },
                     )
                 }
 
