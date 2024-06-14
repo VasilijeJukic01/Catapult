@@ -2,13 +2,6 @@ package com.example.catapult.ui.compose
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Menu
@@ -34,6 +27,7 @@ import androidx.navigation.compose.composable
 import com.example.catapult.R
 import com.example.catapult.ui.compose.user.UserDrawer
 import kotlinx.coroutines.launch
+import androidx.compose.foundation.layout.*
 
 // Navigation
 fun NavGraphBuilder.chooseScreen(
@@ -53,7 +47,7 @@ fun ChooseScreen(navController: NavController) {
         drawerContent = {
             UserDrawer(
                 drawerState = drawerState,
-                onDrawerDestinationClick = { /* handle drawer destination click */ },
+                onDrawerDestinationClick = {},
                 navController = navController
             )
         },
@@ -68,10 +62,10 @@ fun ChooseScreen(navController: NavController) {
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.FillBounds
                 )
-
+                // Drawer Icon
                 IconButton(
                     onClick = { scope.launch { drawerState.open() } },
-                    modifier = Modifier.padding(top = 24.dp)
+                    modifier = Modifier.padding(top = 48.dp)
                 ) {
                     Icon(
                         imageVector = Icons.Default.Menu,
@@ -79,7 +73,6 @@ fun ChooseScreen(navController: NavController) {
                         modifier = Modifier.size(30.dp)
                     )
                 }
-
                 // Buttons
                 Column(
                     modifier = Modifier

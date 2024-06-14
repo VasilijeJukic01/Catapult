@@ -24,8 +24,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.catapult.model.leaderboard.LeaderboardContract
 import com.example.catapult.model.leaderboard.LeaderboardViewModel
+import com.example.catapult.model.leaderboard.LeaderboardContract.*
 
 // TODO: Add back button
 
@@ -37,13 +37,16 @@ fun NavGraphBuilder.leaderboardScreen(
     val viewModel = hiltViewModel<LeaderboardViewModel>()
     val state by viewModel.state.collectAsState()
 
-    LeaderboardScreen(state, viewModel)
+    LeaderboardScreen(
+        state = state,
+        eventPublisher = { viewModel.setEvent(it) }
+    )
 }
 
 @Composable
 fun LeaderboardScreen(
-    state: LeaderboardContract.LeaderboardState,
-    viewModel: LeaderboardViewModel
+    state: LeaderboardState,
+    eventPublisher: (LeaderboardUiEvent) -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -67,7 +70,7 @@ fun LeaderboardScreen(
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
-                    onClick = { viewModel.setEvent(LeaderboardContract.LeaderboardUiEvent.SelectCategory(index + 1)) }
+                    onClick = { eventPublisher(LeaderboardUiEvent.SelectCategory(index + 1)) }
                 )
             }
         }

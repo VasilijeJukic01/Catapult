@@ -1,9 +1,5 @@
 package com.example.catapult.navigation
 
-import androidx.compose.animation.scaleIn
-import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
@@ -20,13 +16,13 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.catapult.datastore.UserStore
 import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
-import com.example.catapult.ui.compose.loginScreen
+import com.example.catapult.ui.compose.user.loginScreen
 import com.example.catapult.ui.compose.catalog.*
 import com.example.catapult.ui.compose.chooseScreen
 import com.example.catapult.ui.compose.quiz.*
 import com.example.catapult.ui.compose.user.addUserScreen
 import com.example.catapult.ui.compose.user.editUserScreen
-import profileScreen
+import com.example.catapult.ui.compose.user.profileScreen
 
 @Composable
 fun AppNavigation(userStore: UserStore) {

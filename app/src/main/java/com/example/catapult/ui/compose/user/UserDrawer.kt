@@ -2,16 +2,6 @@ package com.example.catapult.ui.compose.user
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
@@ -42,6 +32,7 @@ import com.example.catapult.model.user_drawer.UserDrawerContract.*
 import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
+import androidx.compose.foundation.layout.*
 
 @Composable
 fun UserDrawer(
@@ -78,9 +69,7 @@ fun UserDrawer(
             }
             onDrawerDestinationClick(it)
         },
-        eventPublisher = {
-            // TODO Publish event
-        },
+        eventPublisher = {},
         navController = navController,
     )
 }
@@ -117,8 +106,6 @@ fun AppDrawer(
             }
         )
     }
-
-
 
     BoxWithConstraints {
         ModalDrawerSheet(

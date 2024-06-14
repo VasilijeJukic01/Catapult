@@ -16,10 +16,9 @@ class AddUserViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Event
-    private val eventsFlow = MutableSharedFlow<AddUserUiEvent.OnSubmitClick>()
+    private val eventsFlow = MutableSharedFlow<AddUserUiEvent>()
 
-    fun setEvent(event: AddUserUiEvent.OnSubmitClick) =
-        viewModelScope.launch { eventsFlow.emit(event) }
+    fun setEvent(event: AddUserUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }
 
     init {
         handleEvents()

@@ -16,9 +16,9 @@ class EditUserViewModel @Inject constructor(
 ) : ViewModel() {
 
     // Event
-    private val eventsFlow = MutableSharedFlow<EditUserUiEvent.OnSubmitClick>()
+    private val eventsFlow = MutableSharedFlow<EditUserUiEvent>()
 
-    fun setEvent(event: EditUserUiEvent.OnSubmitClick) = viewModelScope.launch { eventsFlow.emit(event) }
+    fun setEvent(event: EditUserUiEvent) = viewModelScope.launch { eventsFlow.emit(event) }
 
     init {
         handleEvents()

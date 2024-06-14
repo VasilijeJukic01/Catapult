@@ -63,6 +63,8 @@ class ProfileViewModel @Inject constructor(
     private fun fetchResults() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
+                repository.fetchLeaderboard()
+
                 val quizHistory = repository.getQuizHistoryForUser(currentUser.nickname)
                 val bestResults = repository.getBestResultForUser(currentUser.nickname)
                 val bestGlobalPositions = repository.getBestGlobalPositionForUser(currentUser.nickname)

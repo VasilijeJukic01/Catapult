@@ -1,6 +1,8 @@
 package com.example.catapult.ui.compose.user
 
+import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -8,51 +10,46 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
-import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent.*
+import com.example.catapult.R
+import com.example.catapult.model.user.login.LoginViewModel
+import com.example.catapult.model.user.login.LoginContract.LoginUiEvent
+import com.example.catapult.model.user.login.LoginContract.LoginUiEvent.OnLoginClick
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.navigation.NamedNavArgument
-import com.example.catapult.datastore.UserData
-import com.example.catapult.model.user.edit.EditUserViewModel
-import kotlinx.serialization.json.Json
+import com.example.catapult.ui.compose.transparentTextField
 
 // Navigation
-fun NavGraphBuilder.editUserScreen(
+fun NavGraphBuilder.loginScreen(
     route: String,
-    arguments: List<NamedNavArgument>,
     navController: NavController,
-) = composable(
-    route = route,
-    arguments = arguments
-) {backStackEntry ->
-    val userJson = backStackEntry.arguments?.getString("user")
-    val user = Json.decodeFromString<UserData>(userJson ?: "")
+) = composable(route = route) {
+    val loginViewModel = hiltViewModel<LoginViewModel>()
+    val state by loginViewModel.state.collectAsState()
 
-    val editUserViewModel = hiltViewModel<EditUserViewModel>()
-
-    EditUserScreen(
-        viewModel = editUserViewModel,
-        user = user,
-        navController = navController
-    )
+    if (state.isLoggedIn) {
+        navController.navigate("choose")
+    } else {
+        LoginScreen(eventPublisher = { loginViewModel.setEvent(it) })
+    }
 }
 
 @Composable
-fun EditUserScreen(
-    viewModel: EditUserViewModel,
-    user: UserData,
-    navController: NavController
+fun LoginScreen(
+    eventPublisher: (LoginUiEvent) -> Unit
 ) {
-    var firstName by remember { mutableStateOf(user.firstName) }
-    var lastName by remember { mutableStateOf(user.lastName) }
-    var nickname by remember { mutableStateOf(user.nickname) }
-    var email by remember { mutableStateOf(user.email) }
+    val image = painterResource(id = R.drawable.background)
 
+    var firstName by remember { mutableStateOf("") }
+    var lastName by remember { mutableStateOf("") }
+    var nickname by remember { mutableStateOf("") }
+    var email by remember { mutableStateOf("") }
 
     // Regex
     val emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
@@ -65,6 +62,13 @@ fun EditUserScreen(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
+        // Background
+        Image(
+            painter = image,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.FillBounds
+        )
         // Form Surface
         Surface(
             modifier = Modifier.fillMaxWidth(),
@@ -75,12 +79,12 @@ fun EditUserScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.Center
             ) {
+                // First Name
                 Text(
-                    text = "Edit Profile",
+                    text = "Login",
                     style = MaterialTheme.typography.titleLarge,
                     modifier = Modifier.padding(bottom = 16.dp)
                 )
-                // First Name
                 TextField(
                     value = firstName,
                     onValueChange = { firstName = it },
@@ -90,17 +94,7 @@ fun EditUserScreen(
                     ) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        unfocusedPlaceholderColor = Color.Black,
-                        focusedPlaceholderColor = Color.Black,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent
-                    )
+                    colors = transparentTextField()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 // Last Name
@@ -113,17 +107,7 @@ fun EditUserScreen(
                     ) },
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
-                    colors = TextFieldDefaults.colors(
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        unfocusedPlaceholderColor = Color.Black,
-                        focusedPlaceholderColor = Color.Black,
-                        focusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
-                        unfocusedContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent
-                    )
+                    colors = transparentTextField()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
                 // Nickname
@@ -137,19 +121,7 @@ fun EditUserScreen(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     isError = isNicknameError,
-                    colors = TextFieldDefaults.colors(
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        unfocusedPlaceholderColor = Color.Black,
-                        focusedPlaceholderColor = Color.Black,
-                        errorTextColor = Color.Black,
-                        errorSupportingTextColor = Color.Black,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
-                        focusedContainerColor = Color.Transparent,
-                        unfocusedContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent
-                    )
+                    colors = transparentTextField(isError = isNicknameError)
                 )
                 if (isNicknameError) {
                     Text(
@@ -171,19 +143,7 @@ fun EditUserScreen(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth(),
                     isError = isEmailError,
-                    colors = TextFieldDefaults.colors(
-                        cursorColor = Color.Black,
-                        focusedTextColor = Color.Black,
-                        unfocusedTextColor = Color.Black,
-                        unfocusedPlaceholderColor = Color.Black,
-                        focusedPlaceholderColor = Color.Black,
-                        errorTextColor = Color.Black,
-                        errorSupportingTextColor = Color.Black,
-                        focusedContainerColor = Color.Transparent,
-                        focusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
-                        unfocusedContainerColor = Color.Transparent,
-                        errorContainerColor = Color.Transparent
-                    )
+                    colors = transparentTextField(isError = isEmailError)
                 )
                 if (isEmailError) {
                     Text(
@@ -197,15 +157,14 @@ fun EditUserScreen(
                 Button(
                     onClick = {
                         if (!isEmailError && !isNicknameError) {
-                            viewModel.setEvent(OnSubmitClick("", firstName, lastName, nickname, email))
-                            navController.navigate("choose")
+                            eventPublisher(OnLoginClick(firstName, lastName, nickname, email))
                         }
                     },
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inversePrimary),
                     modifier = Modifier.fillMaxWidth()
                 ) {
                     Text(
-                        text = "Submit",
+                        text = "Login",
                         color = Color.White,
                     )
                 }
