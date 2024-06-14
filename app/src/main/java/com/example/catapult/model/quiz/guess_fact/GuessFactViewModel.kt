@@ -74,7 +74,7 @@ class GuessFactViewModel @Inject constructor (
             }
             // Next Question
             is GuessTheFactUiEvent.NextQuestion -> {
-                if (state.value.currentQuestionNumber >= 20)
+                if (state.value.currentQuestionNumber >= 3)
                     endQuiz()
                 else {
                     fetchGuessTheFactQuestions()

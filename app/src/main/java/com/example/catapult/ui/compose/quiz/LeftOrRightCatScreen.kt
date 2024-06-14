@@ -2,6 +2,7 @@ package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -30,9 +31,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.rememberAsyncImagePainter
-import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract
-import com.example.catapult.model.quiz.left_or_right.LeftOrRightViewModel
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
+import com.example.catapult.ui.compose.ShowExitQuizDialog
+import com.example.catapult.model.quiz.left_or_right.*
 
 // Navigation
 fun NavGraphBuilder.leftOrRightScreen(
@@ -43,7 +44,7 @@ fun NavGraphBuilder.leftOrRightScreen(
     val state by leftOrRightViewModel.state.collectAsState()
 
     if (state.quizEnded) {
-        navController.navigate("quizEndScreen/${state.totalPoints}")
+        navController.navigate("quizEndScreen/${state.totalPoints}/${3}")
     } else {
         LeftOrRightScreen(
             state = state,
@@ -85,8 +86,12 @@ fun LeftOrRightContent(
 ) {
     val correctColor = Color.Green
     val incorrectColor = Color.Red
+    val showDialog = remember { mutableStateOf(false) }
 
     val orientation = LocalConfiguration.current.orientation
+
+    ShowExitQuizDialog(showDialog, onBackClick)
+    BackHandler(onBack = { showDialog.value = true })
 
     Surface(modifier = Modifier.fillMaxSize()) {
         // Portrait
@@ -100,7 +105,7 @@ fun LeftOrRightContent(
                 TopAppBar(
                     title = { Text("Quiz") },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { showDialog.value = true }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }

@@ -8,7 +8,7 @@ data class LeaderboardData (
     @PrimaryKey
     val id: Int = 0,
     val nickname: String,
-    val position: Int,
+    val position: Int = -1,
     val result: Float,
     val category: Int,
     val createdAt: Long,

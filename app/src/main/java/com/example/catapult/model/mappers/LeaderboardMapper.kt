@@ -33,3 +33,11 @@ fun List<LeaderboardData>.asLeaderboardUiModel(): List<UILeaderboardData> {
         )
     }
 }
+
+fun LeaderboardData.asLeaderboardApiModel(): LeaderboardApiModel {
+    return LeaderboardApiModel(
+        category = this.category,
+        nickname = this.nickname,
+        result = this.result
+    )
+}

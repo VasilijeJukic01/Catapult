@@ -2,6 +2,7 @@ package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
 import android.content.res.Configuration
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
@@ -12,16 +13,6 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material.icons.Icons
@@ -38,6 +29,8 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -53,9 +46,10 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.catalog.UIBreedImage
-import com.example.catapult.model.quiz.guess_cat.GuessCatContract
-import com.example.catapult.model.quiz.guess_cat.GuessCatViewModel
 import com.example.catapult.model.quiz.guess_cat.GuessCatContract.GuessTheCatUiEvent
+import com.example.catapult.ui.compose.ShowExitQuizDialog
+import com.example.catapult.model.quiz.guess_cat.*
+import androidx.compose.foundation.layout.*
 
 // Navigation
 fun NavGraphBuilder.guessTheCatScreen(
@@ -66,7 +60,7 @@ fun NavGraphBuilder.guessTheCatScreen(
     val state by guessCatViewModel.state.collectAsState()
 
     if (state.quizEnded) {
-        navController.navigate("quizEndScreen/${state.totalPoints}")
+        navController.navigate("quizEndScreen/${state.totalPoints}/${2}")
     } else {
         GuessTheCatScreen(
             state = state,
@@ -94,8 +88,12 @@ fun GuessTheCatScreen(
 ) {
     val correctColor = Color.Green
     val incorrectColor = Color.Red
+    val showDialog = remember { mutableStateOf(false) }
 
     val orientation = LocalConfiguration.current.orientation
+
+    ShowExitQuizDialog(showDialog, onBackClick)
+    BackHandler(onBack = { showDialog.value = true })
 
     Surface(modifier = Modifier.fillMaxSize()) {
         // Portrait
@@ -108,7 +106,7 @@ fun GuessTheCatScreen(
                 TopAppBar(
                     title = { Text("Quiz") },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { showDialog.value = true }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }

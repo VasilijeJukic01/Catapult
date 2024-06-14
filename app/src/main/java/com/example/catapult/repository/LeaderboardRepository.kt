@@ -4,12 +4,15 @@ import com.example.catapult.api.LeaderboardApi
 import com.example.catapult.api.models.LeaderboardApiModel
 import com.example.catapult.database.AppDatabase
 import com.example.catapult.database.entities.LeaderboardData
+import com.example.catapult.debug.ErrorTracker
+import com.example.catapult.model.mappers.asLeaderboardApiModel
 import com.example.catapult.model.mappers.asLeaderboardDbModel
 import javax.inject.Inject
 
 class LeaderboardRepository @Inject constructor(
     private val leaderboardApi: LeaderboardApi,
-    private val database: AppDatabase
+    private val database: AppDatabase,
+    private val errorTracker: ErrorTracker
 ) {
 
     // Core
@@ -24,6 +27,15 @@ class LeaderboardRepository @Inject constructor(
         }
 
         database.leaderboardDao().insertAll(leaderboardCategory.asLeaderboardDbModel(listSizes))
+    }
+
+    suspend fun submitQuizResultAPI(leaderboardData: LeaderboardData) {
+        val response = leaderboardApi.postLeaderboard(leaderboardData.asLeaderboardApiModel())
+        errorTracker.logText("LeaderboardRepository", response.toString())
+    }
+
+    fun submitQuizResultDB(leaderboardData: LeaderboardData) {
+        database.leaderboardDao().insertResult(leaderboardData)
     }
 
     // Getters

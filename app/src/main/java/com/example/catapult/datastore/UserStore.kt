@@ -65,5 +65,14 @@ class UserStore @Inject constructor(
                     user.email.isNotEmpty()
         }
     }
+
+    suspend fun getActiveUser(): UserData {
+        persistence.data.firstOrNull()?.forEach { user ->
+            if (user.active == 1) {
+                return user
+            }
+        }
+        return null!!
+    }
 }
 

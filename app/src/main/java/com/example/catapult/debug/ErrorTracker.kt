@@ -12,6 +12,11 @@ class ErrorTracker {
         Log.e(tag, "Error at $timestamp: $message")
     }
 
+    fun logText(tag: String, message: String) {
+        val timestamp = SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.getDefault()).format(Date())
+        Log.d(tag, "Message at $timestamp: $message")
+    }
+
     fun throwError(tag: String, message: String): Nothing {
         logError(tag, message)
         throw Exception(message)

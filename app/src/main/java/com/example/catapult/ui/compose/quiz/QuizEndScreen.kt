@@ -17,25 +17,40 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.compose.material3.Surface
-
-// TODO: Add submit button logic
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.catapult.model.quiz.end_quiz.EndQuizViewModel
+import com.example.catapult.model.quiz.end_quiz.EndQuizContract.*
 
 // Navigation
 fun NavGraphBuilder.quizEndScreen(
     route: String,
     navController: NavController,
-) = composable(route = "$route/{totalPoints}") { backStackEntry ->
+) = composable(route = "$route/{totalPoints}/{category}") { backStackEntry ->
+    val endQuizViewModel = hiltViewModel<EndQuizViewModel>()
+
     val totalPoints = backStackEntry.arguments?.getString("totalPoints")?.toFloat() ?: 0.0f
+    val category = backStackEntry.arguments?.getString("category")?.toInt() ?: 0
+
     QuizEndScreen(
         totalScore = totalPoints,
-        onHomeClick = { navController.navigate("choose") { popUpTo("choose") { inclusive = true } } }
+        category = category,
+        onHomeClick = {
+            navController.navigate("choose") { popUpTo("choose") { inclusive = true } }
+        },
+        onSubmitClick = {
+            navController.navigate("choose") { popUpTo("choose") { inclusive = true } }
+        },
+        eventPublisher = { endQuizViewModel.setEvent(it) }
     )
 }
 
 @Composable
 fun QuizEndScreen(
     totalScore: Float,
-    onHomeClick: () -> Unit
+    category: Int = 0,
+    onHomeClick: () -> Unit,
+    onSubmitClick: () -> Unit,
+    eventPublisher: (EndQuizUIEvent) -> Unit
 ) {
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -45,18 +60,35 @@ fun QuizEndScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
+            // Title
             Text(
                 text = "Quiz Ended",
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
+            // Total Score
             Text(
                 text = "Total Score: $totalScore",
                 style = MaterialTheme.typography.titleLarge
             )
             Spacer(modifier = Modifier.height(16.dp))
+            // Submit Button
             Button(
-                onClick = onHomeClick,
+                onClick = {
+                    eventPublisher(EndQuizUIEvent.Submit(1, category, totalScore))
+                    onSubmitClick()
+                },
+                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            ) {
+                Text("Submit Result")
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            // Home Button
+            Button(
+                onClick = {
+                    eventPublisher(EndQuizUIEvent.Submit(0, category, totalScore))
+                    onHomeClick()
+                },
                 colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
             ) {
                 Text("Home")

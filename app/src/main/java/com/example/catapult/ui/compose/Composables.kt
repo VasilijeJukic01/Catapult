@@ -34,6 +34,9 @@ import androidx.compose.ui.unit.*
 import coil.compose.SubcomposeAsyncImage
 import com.example.catapult.model.catalog.UIBreedImage
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.MutableState
 
 // BredCard
 @Composable
@@ -187,6 +190,31 @@ fun AppIconButton(
             imageVector = imageVector,
             contentDescription = contentDescription,
             tint = tint,
+        )
+    }
+}
+
+// Quiz Exit Dialog
+@Composable
+fun ShowExitQuizDialog(showDialog: MutableState<Boolean>, onBackClick: () -> Unit) {
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("Exit Quiz") },
+            text = { Text("Are you sure you want to exit the quiz?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog.value = false
+                    onBackClick()
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text("Cancel")
+                }
+            }
         )
     }
 }

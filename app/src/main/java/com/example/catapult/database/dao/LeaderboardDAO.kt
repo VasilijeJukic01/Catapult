@@ -27,4 +27,7 @@ interface LeaderboardDAO {
     @Query("SELECT MIN(position) FROM LeaderboardData WHERE nickname = :nickname AND category = :categoryId")
     fun getBestGlobalPositionForUser(nickname: String, categoryId: Int): Int?
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    fun insertResult(leaderboardData: LeaderboardData)
+
 }
