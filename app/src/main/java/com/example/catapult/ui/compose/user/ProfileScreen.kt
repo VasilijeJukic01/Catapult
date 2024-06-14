@@ -18,6 +18,9 @@ import com.example.catapult.datastore.UserData
 import com.example.catapult.model.user.profile.ProfileContract
 import com.example.catapult.model.user.profile.ProfileViewModel
 import kotlinx.serialization.json.Json
+import java.sql.Date
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 // Navigation
 fun NavGraphBuilder.profileScreen(
@@ -52,16 +55,23 @@ fun ProfileScreen(
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Quiz History:", style = MaterialTheme.typography.bodyMedium)
-        state.quizResults.forEach { result ->
-            Text(text = "${result.position}: ${result.result} points")
+        state.quizHistory.forEach { (categoryId, results) ->
+            Text(text = "Category: $categoryId")
+            results.forEach { result ->
+                Text(text = "${result.position}: ${result.result} points : ${formatTimestamp(result.createdAt)}")            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
 
-        Text(text = "Best Results: ${state.bestResults}")
+        Text(text = "Best Results: ${state.bestResults.first}, ${state.bestResults.second}, ${state.bestResults.third}")
 
         Spacer(modifier = Modifier.height(16.dp))
 
         Text(text = "Best Global Positions: ${state.bestGlobalPositions}")
     }
+
+}
+fun formatTimestamp(timestamp: Long): String {
+    val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault())
+    return sdf.format(Date(timestamp))
 }

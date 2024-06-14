@@ -15,7 +15,7 @@ import com.example.catapult.database.entities.LeaderboardData
         BreedImage::class,
         LeaderboardData::class
     ],
-    version = 13,
+    version = 14,
     exportSchema = true,
 )
 abstract class AppDatabase : RoomDatabase() {

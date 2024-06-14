@@ -3,6 +3,7 @@ package com.example.catapult.repository
 import com.example.catapult.api.LeaderboardApi
 import com.example.catapult.api.models.LeaderboardApiModel
 import com.example.catapult.database.AppDatabase
+import com.example.catapult.database.entities.LeaderboardData
 import com.example.catapult.model.mappers.asLeaderboardDbModel
 import javax.inject.Inject
 
@@ -27,5 +28,26 @@ class LeaderboardRepository @Inject constructor(
 
     // Getters
     fun getLeaderboardData(categoryId: Int) = database.leaderboardDao().getAllLeaderboardDataCategory(categoryId)
+
+    fun getBestGlobalPositionForUser(nickname: String): Triple<Int, Int, Int> {
+        val positions = (1..3).map { categoryId ->
+            database.leaderboardDao().getBestGlobalPositionForUser(nickname, categoryId) ?: -1
+        }
+        return Triple(positions[0], positions[1], positions[2])
+    }
+
+    fun getBestResultForUser(nickname: String): Triple<Float, Float, Float> {
+        val results = (1..3).map { categoryId ->
+            database.leaderboardDao().getBestResultForUser(nickname, categoryId)
+        }
+        return Triple(results[0], results[1], results[2])
+    }
+
+    fun getQuizHistoryForUser(nickname: String): Map<Int, List<LeaderboardData>> {
+        return (1..3).associateWith { categoryId ->
+            database.leaderboardDao().getQuizHistoryForUser(nickname, categoryId)
+        }
+    }
+
 
 }
