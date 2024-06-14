@@ -8,18 +8,18 @@ import kotlinx.serialization.json.Json
 import java.io.InputStream
 import java.io.OutputStream
 
-class UserDataSerializer : Serializer<UserData> {
+class UserDataSerializer : Serializer<List<UserData>> {
 
-    override val defaultValue: UserData = UserData("","","","", "")
+    override val defaultValue: List<UserData> = emptyList()
 
-    override suspend fun readFrom(input: InputStream): UserData {
+    override suspend fun readFrom(input: InputStream): List<UserData> {
         return withContext(Dispatchers.IO) {
             val inputString = input.bufferedReader().use { it.readText() }
             Json.decodeFromString(inputString)
         }
     }
 
-    override suspend fun writeTo(t: UserData, output: OutputStream) {
+    override suspend fun writeTo(t: List<UserData>, output: OutputStream) {
         withContext(Dispatchers.IO) {
             val outputString = Json.encodeToString(t)
             output.write(outputString.toByteArray())

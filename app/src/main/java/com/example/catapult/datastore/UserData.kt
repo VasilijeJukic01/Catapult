@@ -9,4 +9,5 @@ data class UserData(
     val lastName: String = "",
     val nickname: String = "",
     val email: String = "",
+    val active: Int = 0,
 )

@@ -53,8 +53,8 @@ class LoginViewModel @Inject constructor(
             // Login
             is LoginUiEvent.OnLoginClick -> {
                 setState { copy(isLoading = true) }
-                val user = UserData("", event.firstName, event.lastName, event.nickname, event.emails)
-                store.updateUserData(user)
+                val user = UserData("", event.firstName, event.lastName, event.nickname, event.email, 1)
+                store.setUserData(user)
                 setState { copy(isLoading = false, isLoggedIn = true) }
             }
         }

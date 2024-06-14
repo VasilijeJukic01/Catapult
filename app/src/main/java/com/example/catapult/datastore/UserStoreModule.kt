@@ -17,10 +17,11 @@ object UserStoreModule {
 
     @Provides
     @Singleton
-    fun provideAuthDataStore(@ApplicationContext context: Context, ): DataStore<UserData> =
+    fun provideAuthDataStore(@ApplicationContext context: Context): DataStore<List<UserData>> =
         DataStoreFactory.create(
             produceFile = { context.dataStoreFile("auth.txt") },
-            serializer = UserDataSerializer(),
+            serializer = UserDataSerializer()
         )
 
 }
+

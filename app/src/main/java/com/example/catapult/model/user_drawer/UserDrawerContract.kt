@@ -11,7 +11,7 @@ interface UserDrawerContract {
         val accounts: Flow<List<UserData>> = flowOf(emptyList())
     )
     sealed class DrawerUiEvent {
-        data object SwitchAccount : DrawerUiEvent()
+        data class SwitchAccount(val user: UserData) : DrawerUiEvent()
         data class AddAccount(val user: UserData) : DrawerUiEvent()
         data class Logout(val user: UserData) : DrawerUiEvent()
     }

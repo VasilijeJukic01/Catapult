@@ -24,6 +24,7 @@ import com.example.catapult.ui.compose.loginScreen
 import com.example.catapult.ui.compose.catalog.*
 import com.example.catapult.ui.compose.chooseScreen
 import com.example.catapult.ui.compose.quiz.*
+import com.example.catapult.ui.compose.user.addUserScreen
 import com.example.catapult.ui.compose.user.editUserScreen
 import profileScreen
 
@@ -123,6 +124,10 @@ fun AppNavigation(userStore: UserStore) {
                 navArgument("user") { type = NavType.StringType }
             ),
             navController = navController
+        )
+        addUserScreen(
+            route = "addUser",
+            navController = navController,
         )
     }
 }

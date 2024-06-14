@@ -72,6 +72,9 @@ fun UserDrawer(
                     val userJson = Json.encodeToJsonElement(it.user)
                     navController.navigate("editUser/$userJson")
                 }
+                is UserDrawerDestination.AddProfile -> {
+                    navController.navigate("addUser")
+                }
             }
             onDrawerDestinationClick(it)
         },
@@ -115,6 +118,8 @@ fun AppDrawer(
         )
     }
 
+
+
     BoxWithConstraints {
         ModalDrawerSheet(
             modifier = Modifier.width(maxWidth * 3 / 4),
@@ -143,7 +148,7 @@ fun AppDrawer(
                     AppDrawerActionItem(
                         icon = Icons.Default.Add,
                         text = "Add Profile",
-                        onClick = {  userDrawerViewModel.setEvent(DrawerUiEvent.AddAccount(state.currentAccount))},
+                        onClick = {  onDrawerDestinationClick(UserDrawerDestination.AddProfile) },
                     )
 
                     AppDrawerActionItem(

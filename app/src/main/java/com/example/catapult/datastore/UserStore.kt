@@ -1,57 +1,69 @@
 package com.example.catapult.datastore
 
-import android.util.Log
 import androidx.datastore.core.DataStore
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.toList
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
 class UserStore @Inject constructor(
-    private val persistence: DataStore<UserData>
+    private val persistence: DataStore<List<UserData>>
 ) {
 
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    val userData = persistence.data
+    val userData: Flow<List<UserData>> = persistence.data
         .stateIn(
             scope = scope,
             started = SharingStarted.Eagerly,
             initialValue = runBlocking { persistence.data.first() },
         )
 
-    suspend fun updateUserData(newUserData: UserData) {
-        persistence.updateData { newUserData }
-        Log.d("AuthStore", "Data updated: $newUserData")
+    suspend fun addUserData(newUserData: UserData) {
+        persistence.updateData { currentUsers ->
+            val updatedUsers = currentUsers.map { user ->
+                user.copy(active = 0)
+            }.toMutableList()
+            updatedUsers.add(newUserData)
+            updatedUsers
+        }
     }
 
-    suspend fun getUser(): UserData {
-        return persistence.data.first()
+    suspend fun setUserData(newUserData: UserData) {
+        persistence.updateData { listOf(newUserData) }
+    }
+
+    suspend fun updateUserData(updatedUserData: UserData) {
+        persistence.updateData { currentUsers ->
+            currentUsers.map { user ->
+                if (user.nickname == updatedUserData.nickname) updatedUserData else user
+            }
+        }
+    }
+
+    suspend fun getUser(): UserData? {
+        return persistence.data.firstOrNull()?.firstOrNull()
     }
 
     fun getAllUsers(): Flow<List<UserData>> {
-        return persistence.data.map { listOf(it) }
+        return persistence.data
     }
 
     suspend fun deleteUser() {
-        Log.d("AuthStore", "Data deleted")
-        persistence.updateData { UserData() }
+        persistence.updateData { emptyList() }
     }
 
     suspend fun isUserLoggedIn(): Boolean {
-        val userData = persistence.data.first()
-        return userData.firstName.isNotEmpty() &&
-                userData.lastName.isNotEmpty() &&
-                userData.nickname.isNotEmpty() &&
-                userData.email.isNotEmpty()
+        val users = persistence.data.first()
+        return users.any { user ->
+            user.firstName.isNotEmpty() &&
+                    user.lastName.isNotEmpty() &&
+                    user.nickname.isNotEmpty() &&
+                    user.email.isNotEmpty()
+        }
     }
-
 }
+

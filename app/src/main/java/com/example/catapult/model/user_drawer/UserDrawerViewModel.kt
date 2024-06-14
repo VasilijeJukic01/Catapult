@@ -3,6 +3,7 @@ package com.example.catapult.model.user_drawer
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.datastore.UserData
 import com.example.catapult.datastore.UserStore
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -50,7 +51,9 @@ class UserDrawerViewModel @Inject constructor(
     private fun handleEvent(event: DrawerUiEvent) {
         when (event) {
             is DrawerUiEvent.SwitchAccount -> {
-                // TODO
+                viewModelScope.launch {
+                    userStore.setUserData(event.user)
+                }
             }
 
             is DrawerUiEvent.AddAccount -> {
@@ -74,9 +77,10 @@ class UserDrawerViewModel @Inject constructor(
                 val usersFlow = userStore.getAllUsers()
                 usersFlow.collect { users ->
                     Log.d("UserDrawerViewModel", "Users: $users")
+                    val currentUser = users.find { it.active == 1 }
                     setState {
                         copy(
-                            currentAccount = users.first(),
+                            currentAccount = currentUser ?: UserData(),
                             accounts = usersFlow
                         )
                     }

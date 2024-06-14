@@ -10,6 +10,6 @@ interface LoginContract {
     )
 
     sealed class LoginUiEvent {
-        data class OnLoginClick(val firstName: String, val lastName: String, val nickname: String, val emails: String) : LoginUiEvent()
+        data class OnLoginClick(val firstName: String, val lastName: String, val nickname: String, val email: String) : LoginUiEvent()
     }
 }
