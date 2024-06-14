@@ -3,7 +3,7 @@ package com.example.catapult.model.quiz.guess_fact
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.model.quiz.GuessCatQuestionType
+import com.example.catapult.model.quiz.GuessFactQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
@@ -107,11 +107,11 @@ class GuessFactViewModel @Inject constructor (
                 val questions = repository.guessTheFactFetch()
                 val currentQuestion = questions.random()
 
-                val questionType = currentQuestion.secondQuestionType
+                val questionType = currentQuestion.questionType
                 val question = when (questionType) {
-                    GuessCatQuestionType.GUESS_THE_BREED -> "Which cat is this?"
-                    GuessCatQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Which temperament is not associated with the breed?"
-                    GuessCatQuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Which temperament is associated with this breed?"
+                    GuessFactQuestionType.GUESS_THE_BREED -> "Which cat is this?"
+                    GuessFactQuestionType.GUESS_THE_OUTLIER_TEMPERAMENT -> "Which temperament is not associated with the breed?"
+                    GuessFactQuestionType.GUESS_THE_CORRECT_TEMPERAMENT -> "Which temperament is associated with this breed?"
                 }
 
                 val catImage = currentQuestion.breedAndImage.second

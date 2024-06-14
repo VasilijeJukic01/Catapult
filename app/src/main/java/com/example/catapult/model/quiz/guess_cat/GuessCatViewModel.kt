@@ -3,7 +3,7 @@ package com.example.catapult.model.quiz.guess_cat
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.model.quiz.GuessFactQuestionType
+import com.example.catapult.model.quiz.GuessCatQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import com.example.catapult.model.quiz.guess_cat.GuessCatContract.GuessTheCatState
@@ -102,15 +102,19 @@ class GuessCatViewModel @Inject constructor (
     private fun fetchGuessTheCatQuestions() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val catBreedsAndImages = repository.guessTheCatFetch()
-                val catImages = catBreedsAndImages.map { it.second }
-                val correctAnswer = catImages.indices.random()
+                val questions = repository.guessTheCatFetch()
+                val currentQuestion = questions.random()
 
-                val questionType = GuessFactQuestionType.entries.toTypedArray().random()
+                val questionType = currentQuestion.questionType
+
+                val breed = currentQuestion.breedAndImages[currentQuestion.correctAnswer].first
                 val question = when (questionType) {
-                    GuessFactQuestionType.GUESS_THE_TEMPERAMENT -> "Which cat is ${catBreedsAndImages[correctAnswer].first.temperament.random()}?"
-                    GuessFactQuestionType.GUESS_THE_BREED -> "Which cat is of the breed ${catBreedsAndImages[correctAnswer].first.name}?"
+                    GuessCatQuestionType.GUESS_THE_TEMPERAMENT -> "Which cat is ${currentQuestion.temperament}?"
+                    GuessCatQuestionType.GUESS_THE_BREED -> "Which cat is of the breed ${breed.name}?"
                 }
+
+                val correctAnswer = currentQuestion.correctAnswer
+                val catImages = currentQuestion.breedAndImages.map { it.second }
 
                 setState { copy(
                     question = question,
