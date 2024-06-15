@@ -33,6 +33,8 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Star
 
 @Composable
@@ -51,31 +53,37 @@ fun UserDrawer(
     }
     val uiState = viewModel.state.collectAsState()
 
-    AppDrawer(
-        state = uiState.value,
-        onDrawerDestinationClick = {
-            uiScope.launch { drawerState.close() }
-            val destination = when (it) {
-                is UserDrawerDestination.Profile -> {
-                    val userJson = Json.encodeToJsonElement(it.user)
-                    navController.navigate("profile/$userJson")
+    if (uiState.value.loginRedirect) {
+        navController.navigate("login")
+    } else
+        AppDrawer(
+            state = uiState.value,
+            onDrawerDestinationClick = {
+                uiScope.launch { drawerState.close() }
+                val destination = when (it) {
+                    is UserDrawerDestination.Profile -> {
+                        val userJson = Json.encodeToJsonElement(it.user)
+                        navController.navigate("profile/$userJson")
+                    }
+
+                    is UserDrawerDestination.EditProfile -> {
+                        val userJson = Json.encodeToJsonElement(it.user)
+                        navController.navigate("editUser/$userJson")
+                    }
+
+                    is UserDrawerDestination.AddProfile -> {
+                        navController.navigate("addUser")
+                    }
+
+                    is UserDrawerDestination.Leaderboard -> {
+                        navController.navigate("leaderboard")
+                    }
                 }
-                is UserDrawerDestination.EditProfile -> {
-                    val userJson = Json.encodeToJsonElement(it.user)
-                    navController.navigate("editUser/$userJson")
-                }
-                is UserDrawerDestination.AddProfile -> {
-                    navController.navigate("addUser")
-                }
-                is UserDrawerDestination.Leaderboard -> {
-                    navController.navigate("leaderboard")
-                }
-            }
-            onDrawerDestinationClick(it)
-        },
-        eventPublisher = {},
-        navController = navController,
-    )
+                onDrawerDestinationClick(it)
+            },
+            eventPublisher = {},
+            navController = navController,
+        )
 }
 
 @Composable
@@ -87,29 +95,71 @@ fun AppDrawer(
     userDrawerViewModel: UserDrawerViewModel = hiltViewModel(),
 ) {
 
-    val showDialog = remember { mutableStateOf(false) }
+    val logoutDialog = remember { mutableStateOf(false) }
+    val switchProfileDialog = remember { mutableStateOf(false) }
+    val remainingUsers = state.accounts.collectAsState(initial = emptyList()).value
 
-    if (showDialog.value) {
+    if (logoutDialog.value) {
         AlertDialog(
-            onDismissRequest = { showDialog.value = false },
+            onDismissRequest = { logoutDialog.value = false },
             title = { Text("Logout") },
             text = { Text("Are you sure you want to logout?") },
             confirmButton = {
                 TextButton(onClick = {
-                    showDialog.value = false
+                    logoutDialog.value = false
                     userDrawerViewModel.setEvent(DrawerUiEvent.Logout(state.currentAccount))
-                    navController.navigate("login")
+                    if (state.loginRedirect) {
+                        navController.navigate("login")
+                    } else {
+                        eventPublisher(DrawerUiEvent.SwitchAccount(remainingUsers.first()))
+                    }
                 }) {
                     Text("Confirm")
                 }
             },
             dismissButton = {
-                TextButton(onClick = { showDialog.value = false }) {
+                TextButton(onClick = { logoutDialog.value = false }) {
                     Text("Cancel")
                 }
             }
         )
     }
+
+    if (switchProfileDialog.value) {
+        AlertDialog(
+            onDismissRequest = { switchProfileDialog.value = false },
+            title = { Text("Switch Profile") },
+            text = {
+                val users = state.accounts.collectAsState(initial = emptyList()).value
+                LazyColumn {
+                    items(users.size) { index ->
+                        val user = users[index]
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    userDrawerViewModel.setEvent(DrawerUiEvent.SwitchAccount(user))
+                                    switchProfileDialog.value = false
+                                }
+                                .padding(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Spacer(modifier = Modifier.width(8.dp))
+
+                            Text(
+                                text = user.nickname,
+                                style = MaterialTheme.typography.bodyMedium
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {}
+        )
+
+    }
+
+
 
     BoxWithConstraints {
         ModalDrawerSheet(
@@ -139,13 +189,19 @@ fun AppDrawer(
                     AppDrawerActionItem(
                         icon = Icons.Default.Add,
                         text = "Add Profile",
-                        onClick = {  onDrawerDestinationClick(UserDrawerDestination.AddProfile) },
+                        onClick = { onDrawerDestinationClick(UserDrawerDestination.AddProfile) },
                     )
 
                     AppDrawerActionItem(
                         icon = Icons.Default.Edit,
                         text = "Edit Profile",
                         onClick = { onDrawerDestinationClick(UserDrawerDestination.EditProfile(state.currentAccount)) },
+                    )
+
+                    AppDrawerActionItem(
+                        icon = Icons.Default.Face,
+                        text = "Switch Profile",
+                        onClick = { switchProfileDialog.value = true },
                     )
 
                     AppDrawerActionItem(
@@ -160,7 +216,7 @@ fun AppDrawer(
                 AppDrawerActionItem(
                     icon = Icons.Default.ExitToApp,
                     text = "Logout",
-                    onClick = { showDialog.value = true },
+                    onClick = { logoutDialog.value = true },
                 )
             }
         }

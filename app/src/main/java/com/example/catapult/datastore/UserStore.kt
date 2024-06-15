@@ -32,6 +32,14 @@ class UserStore @Inject constructor(
         }
     }
 
+    suspend fun switchUser(activeUser: UserData) {
+        persistence.updateData { currentUsers ->
+            currentUsers.map { user ->
+                user.copy(active = if (user == activeUser) 1 else 0)
+            }
+        }
+    }
+
     suspend fun setUserData(newUserData: UserData) {
         persistence.updateData { listOf(newUserData) }
     }
@@ -39,7 +47,7 @@ class UserStore @Inject constructor(
     suspend fun updateUserData(updatedUserData: UserData) {
         persistence.updateData { currentUsers ->
             currentUsers.map { user ->
-                if (user.nickname == updatedUserData.nickname) updatedUserData else user
+                if (user.active == 1) updatedUserData else user
             }
         }
     }
@@ -52,8 +60,10 @@ class UserStore @Inject constructor(
         return persistence.data
     }
 
-    suspend fun deleteUser() {
-        persistence.updateData { emptyList() }
+    suspend fun deleteUser(userToDelete: UserData) {
+        persistence.updateData { currentUsers ->
+            currentUsers.filter { user -> user != userToDelete }
+        }
     }
 
     suspend fun isUserLoggedIn(): Boolean {

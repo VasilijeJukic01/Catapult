@@ -1,6 +1,5 @@
 package com.example.catapult.model.user_drawer
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.datastore.UserData
@@ -13,6 +12,8 @@ import javax.inject.Inject
 import com.example.catapult.model.user_drawer.UserDrawerContract.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.emptyFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
@@ -50,21 +51,20 @@ class UserDrawerViewModel @Inject constructor(
         when (event) {
             is DrawerUiEvent.SwitchAccount -> {
                 viewModelScope.launch {
-                    userStore.setUserData(event.user)
+                    switchUser(event.user)
                 }
-            }
-
-            is DrawerUiEvent.AddAccount -> {
-                // TODO
             }
 
             is DrawerUiEvent.Logout -> {
-                Log.d("UserDrawerViewModel before", "Logout")
                 viewModelScope.launch {
-                    userStore.deleteUser()
+                    userStore.deleteUser(event.user)
+                    val remainingUsers = userStore.getAllUsers().first()
+                    if (remainingUsers.isNotEmpty()) {
+                        userStore.switchUser(remainingUsers.first())
+                    }
+                    else
+                        setState { copy(currentAccount = UserData(), accounts = emptyFlow(), loginRedirect = true)}
                 }
-                Log.d("UserDrawerViewModel after", "Logout")
-
             }
         }
     }
@@ -74,7 +74,6 @@ class UserDrawerViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val usersFlow = userStore.getAllUsers()
                 usersFlow.collect { users ->
-                    Log.d("UserDrawerViewModel", "Users: $users")
                     val currentUser = users.find { it.active == 1 }
                     setState {
                         copy(
@@ -83,6 +82,15 @@ class UserDrawerViewModel @Inject constructor(
                         )
                     }
                 }
+            }
+        }
+    }
+
+    private fun switchUser(user: UserData) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                userStore.switchUser(user)
+                setState { copy(currentAccount = user)}
             }
         }
     }

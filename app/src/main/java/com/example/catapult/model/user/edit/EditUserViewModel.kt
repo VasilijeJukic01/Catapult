@@ -1,5 +1,6 @@
 package com.example.catapult.model.user.edit
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.datastore.UserData
@@ -36,9 +37,9 @@ class EditUserViewModel @Inject constructor(
 
     private suspend fun handleEvent(event: EditUserUiEvent) {
         when (event) {
-            // Change Profile
+            // Edit Profile
             is EditUserUiEvent.OnSubmitClick -> {
-                val user = UserData("", event.firstName, event.lastName, event.nickname, event.emails)
+                val user = UserData("", event.firstName, event.lastName, event.nickname, event.email,1)
                 store.updateUserData(user)
             }
         }

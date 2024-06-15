@@ -8,7 +8,7 @@ interface EditUserContract {
             val firstName: String,
             val lastName: String,
             val nickname: String,
-            val emails: String
+            val email: String
         ) : EditUserUiEvent()
     }
 
