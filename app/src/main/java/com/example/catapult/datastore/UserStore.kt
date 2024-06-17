@@ -8,6 +8,8 @@ import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// TODO: [PRIORITY LOW] Refactor
+
 @Singleton
 class UserStore @Inject constructor(
     private val persistence: DataStore<List<UserData>>
@@ -62,7 +64,7 @@ class UserStore @Inject constructor(
 
     suspend fun deleteUser(userToDelete: UserData) {
         persistence.updateData { currentUsers ->
-            currentUsers.filter { user -> user != userToDelete }
+            currentUsers.filter { it.nickname != userToDelete.nickname }
         }
     }
 
@@ -79,6 +81,15 @@ class UserStore @Inject constructor(
     suspend fun getActiveUser(): UserData {
         persistence.data.firstOrNull()?.forEach { user ->
             if (user.active == 1) {
+                return user
+            }
+        }
+        return null!!
+    }
+
+    suspend fun getUserByNickname(nickname: String): UserData {
+        persistence.data.firstOrNull()?.forEach { user ->
+            if (user.nickname == nickname.substring(1, nickname.length-1)) {
                 return user
             }
         }

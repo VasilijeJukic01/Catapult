@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.catapult.datastore.UserData
 import com.example.catapult.datastore.UserStore
 import com.example.catapult.model.user.create.AddUserContract.*
+import com.example.catapult.ui.compose.avatar.getRandomAvatar
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.launch
@@ -38,7 +39,7 @@ class AddUserViewModel @Inject constructor(
         when (event) {
             // Change Profile
             is AddUserUiEvent.OnSubmitClick -> {
-                val user = UserData(event.avatar, event.firstName, event.lastName, event.nickname, event.email, 1)
+                val user = UserData(getRandomAvatar(), event.firstName, event.lastName, event.nickname, event.email, 1)
                 store.addUserData(user)
             }
         }

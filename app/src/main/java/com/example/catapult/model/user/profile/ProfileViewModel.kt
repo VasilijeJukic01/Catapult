@@ -3,7 +3,7 @@ package com.example.catapult.model.user.profile
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.catapult.datastore.UserData
+import com.example.catapult.datastore.UserStore
 import com.example.catapult.model.user.profile.ProfileContract.*
 import com.example.catapult.repository.LeaderboardRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,17 +14,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.getAndUpdate
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 @HiltViewModel
 class ProfileViewModel @Inject constructor(
+    private val store: UserStore,
     private val repository: LeaderboardRepository,
     savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
-    private val currentUser: UserData = savedStateHandle.get<String>("user")?.let {
-        Json.decodeFromString<UserData>(it) } ?: throw IllegalStateException("User data missing")
+    private val nickname = savedStateHandle.get<String>("user") ?: throw IllegalStateException("user required")
 
     // State
     private val stateFlow = MutableStateFlow(ProfileState())
@@ -39,6 +38,7 @@ class ProfileViewModel @Inject constructor(
 
     init {
         handleEvents()
+        fetchUser()
         fetchResults()
     }
 
@@ -60,14 +60,23 @@ class ProfileViewModel @Inject constructor(
     }
 
     // Fetch
+    private fun fetchUser() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                val user = store.getUserByNickname(nickname)
+                setState { copy(currentUser = user) }
+            }
+        }
+    }
+
     private fun fetchResults() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 repository.fetchLeaderboard()
 
-                val quizHistory = repository.getQuizHistoryForUser(currentUser.nickname)
-                val bestResults = repository.getBestResultForUser(currentUser.nickname)
-                val bestGlobalPositions = repository.getBestGlobalPositionForUser(currentUser.nickname)
+                val quizHistory = repository.getQuizHistoryForUser(nickname)
+                val bestResults = repository.getBestResultForUser(nickname)
+                val bestGlobalPositions = repository.getBestGlobalPositionForUser(nickname)
 
                 setState { copy(quizHistory = quizHistory, bestResults = bestResults, bestGlobalPositions = bestGlobalPositions) }
             }

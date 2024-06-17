@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 import com.example.catapult.model.user.login.LoginContract.LoginUiEvent
 import com.example.catapult.model.user.login.LoginContract.LoginState
+import com.example.catapult.ui.compose.avatar.getRandomAvatar
 
 @HiltViewModel
 class LoginViewModel @Inject constructor(
@@ -53,7 +54,7 @@ class LoginViewModel @Inject constructor(
             // Login
             is LoginUiEvent.OnLoginClick -> {
                 setState { copy(isLoading = true) }
-                val user = UserData("", event.firstName, event.lastName, event.nickname, event.email, 1)
+                val user = UserData(getRandomAvatar(), event.firstName, event.lastName, event.nickname, event.email, 1)
                 store.setUserData(user)
                 setState { copy(isLoading = false, isLoggedIn = true) }
             }

@@ -36,7 +36,7 @@ fun NavGraphBuilder.addUserScreen(
     AddProfileScreen(
         eventPublisher = { addUserViewModel.setEvent(it) },
         onBackClick = { navController.popBackStack() },
-        onSubmittClick = { navController.navigate("choose") }
+        onSubmitClick = { navController.navigate("choose") }
     )
 }
 
@@ -45,7 +45,7 @@ fun NavGraphBuilder.addUserScreen(
 fun AddProfileScreen(
     eventPublisher: (AddUserUiEvent) -> Unit,
     onBackClick: () -> Unit = {},
-    onSubmittClick: () -> Unit = {},
+    onSubmitClick: () -> Unit = {},
 ) {
     val image = painterResource(id = R.drawable.background2)
 
@@ -53,7 +53,6 @@ fun AddProfileScreen(
     var lastName by remember { mutableStateOf("") }
     var nickname by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
-
 
     // Regex
     val emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
@@ -168,10 +167,8 @@ fun AddProfileScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
-                                eventPublisher(
-                                    OnSubmitClick("", firstName, lastName, nickname, email)
-                                )
-                                onSubmittClick()
+                                eventPublisher(OnSubmitClick("", firstName, lastName, nickname, email))
+                                onSubmitClick()
                             }
                         },
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inversePrimary),

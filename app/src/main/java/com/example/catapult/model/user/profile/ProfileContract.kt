@@ -7,7 +7,7 @@ interface ProfileContract {
 
     data class ProfileState(
         val currentUser: UserData = UserData(),
-        val quizHistory: Map<Int, List<LeaderboardData>> = emptyMap(),//history
+        val quizHistory: Map<Int, List<LeaderboardData>> = emptyMap(),
         val bestResults: Triple<Float, Float, Float> = Triple(-1.0f, -1.0f, -1.0f),
         val bestGlobalPositions: Triple<Int, Int, Int> = Triple(-1, -1, -1),
         val isError: Boolean = false,

@@ -1,6 +1,10 @@
 package com.example.catapult.ui.compose.user
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -16,18 +20,26 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.navigation.NamedNavArgument
+import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.R
-import com.example.catapult.datastore.UserData
+import com.example.catapult.model.user.edit.EditUserContract
 import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent
 import com.example.catapult.model.user.edit.EditUserViewModel
+import com.example.catapult.ui.compose.avatar.copyImageToAppDir
+import com.example.catapult.ui.compose.avatar.getAvatarResource
 import com.example.catapult.ui.compose.transparentTextField
-import kotlinx.serialization.json.Json
 
 // Navigation
 fun NavGraphBuilder.editUserScreen(
@@ -38,14 +50,12 @@ fun NavGraphBuilder.editUserScreen(
     route = route,
     arguments = arguments
 ) {backStackEntry ->
-    val userJson = backStackEntry.arguments?.getString("user")
-    val user = Json.decodeFromString<UserData>(userJson ?: "")
-
-    val editUserViewModel = hiltViewModel<EditUserViewModel>()
+    val editUserViewModel = hiltViewModel<EditUserViewModel>(backStackEntry)
+    val state by editUserViewModel.state.collectAsState()
 
     EditUserScreen(
         eventPublisher = { editUserViewModel.setEvent(it) },
-        user = user,
+        state = state,
         onBackClick = { navController.popBackStack() },
         onSubmitClick = { navController.navigate("choose") }
     )
@@ -55,17 +65,37 @@ fun NavGraphBuilder.editUserScreen(
 @Composable
 fun EditUserScreen(
     eventPublisher: (EditUserUiEvent) -> Unit,
-    user: UserData,
+    state: EditUserContract.EditUserState,
     onBackClick: () -> Unit = {},
     onSubmitClick: () -> Unit = {},
 ) {
     val image = painterResource(id = R.drawable.background2)
 
-    var firstName by remember { mutableStateOf(user.firstName) }
-    var lastName by remember { mutableStateOf(user.lastName) }
-    var nickname by remember { mutableStateOf(user.nickname) }
-    var email by remember { mutableStateOf(user.email) }
+    var firstName by remember { mutableStateOf(state.user.firstName) }
+    var lastName by remember { mutableStateOf(state.user.lastName) }
+    var nickname by remember { mutableStateOf(state.user.nickname) }
+    var email by remember { mutableStateOf(state.user.email) }
 
+    LaunchedEffect(state.user) {
+        firstName = state.user.firstName
+        lastName = state.user.lastName
+        nickname = state.user.nickname
+        email = state.user.email
+    }
+
+    // Avatar
+    var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
+
+    val context = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+        val copiedImageUri = uri?.let {
+            copyImageToAppDir(context, context.contentResolver,
+                it, "selectedImage")
+        }
+        if (copiedImageUri != null) {
+            selectedImageUri = copiedImageUri
+        }
+    }
 
     // Regex
     val emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
@@ -111,6 +141,33 @@ fun EditUserScreen(
                         style = MaterialTheme.typography.titleLarge,
                         modifier = Modifier.padding(bottom = 16.dp)
                     )
+                    // Avatar
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        val avatar: Painter = selectedImageUri?.let { uri ->
+                            rememberAsyncImagePainter(model = uri)
+                        } ?: if (state.user.avatar.contains("@Default")) {
+                            painterResource(id = getAvatarResource(state.user.avatar))
+                        } else {
+                            rememberAsyncImagePainter(model = state.user.avatar)
+                        }
+                        Image(
+                            painter = avatar,
+                            contentDescription = "Avatar Icon",
+                            modifier = Modifier
+                                .size(80.dp)
+                                .clip(CircleShape)
+                                .background(MaterialTheme.colorScheme.surface),
+                            contentScale = ContentScale.Crop
+                        )
+                        Spacer(modifier = Modifier.width(16.dp))
+                        Button(onClick = { launcher.launch("image/*") }) {
+                            Text("Choose Photo")
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(24.dp))
                     // First Name
                     TextField(
                         value = firstName,
@@ -184,7 +241,7 @@ fun EditUserScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
-                                eventPublisher(OnSubmitClick("", firstName, lastName, nickname, email))
+                                eventPublisher(OnSubmitClick(selectedImageUri.toString(), firstName, lastName, nickname, email))
                                 onSubmitClick()
                             }
                         },

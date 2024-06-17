@@ -1,20 +1,13 @@
 package com.example.catapult.ui.compose.user
 
 import androidx.activity.compose.BackHandler
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.ExitToApp
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Divider
-import androidx.compose.material3.DrawerState
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalDrawerSheet
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
@@ -34,8 +27,18 @@ import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Star
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import coil.compose.rememberAsyncImagePainter
+import com.example.catapult.ui.compose.avatar.getAvatarResource
+import androidx.compose.material3.*
+
+// TODO: [PRIORITY HIGH] Refactor
 
 @Composable
 fun UserDrawer(
@@ -180,11 +183,47 @@ fun AppDrawer(
                 }
 
                 Column(modifier = Modifier.weight(1f)) {
-                    AppDrawerActionItem(
-                        icon = Icons.Default.Person,
-                        text = state.currentAccount.nickname,
-                        onClick = { onDrawerDestinationClick(UserDrawerDestination.Profile(state.currentAccount)) },
-                    )
+                    // Avatar
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { onDrawerDestinationClick(UserDrawerDestination.Profile(state.currentAccount.nickname)) }
+                            .padding(16.dp),
+                    ) {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            val avatarUri = state.currentAccount.avatar
+                            if (avatarUri.contains("@Default")) {
+                                val avatar: Painter = painterResource(id = getAvatarResource(avatarUri))
+                                Image(
+                                    painter = avatar,
+                                    contentDescription = "Avatar Icon",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surface),
+                                    contentScale = ContentScale.Crop
+                                )
+                            } else {
+                                val avatar: Painter = rememberAsyncImagePainter(model = avatarUri)
+                                Image(
+                                    painter = avatar,
+                                    contentDescription = "Avatar Icon",
+                                    modifier = Modifier
+                                        .size(48.dp)
+                                        .clip(CircleShape)
+                                        .background(MaterialTheme.colorScheme.surface),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(16.dp))
+                            Text(
+                                text = state.currentAccount.nickname,
+                                style = MaterialTheme.typography.bodyLarge,
+                            )
+                        }
+                    }
 
                     AppDrawerActionItem(
                         icon = Icons.Default.Add,
@@ -195,7 +234,7 @@ fun AppDrawer(
                     AppDrawerActionItem(
                         icon = Icons.Default.Edit,
                         text = "Edit Profile",
-                        onClick = { onDrawerDestinationClick(UserDrawerDestination.EditProfile(state.currentAccount)) },
+                        onClick = { onDrawerDestinationClick(UserDrawerDestination.EditProfile(state.currentAccount.nickname)) },
                     )
 
                     AppDrawerActionItem(

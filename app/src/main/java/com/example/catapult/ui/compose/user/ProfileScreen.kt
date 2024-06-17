@@ -34,7 +34,6 @@ import androidx.navigation.compose.composable
 import com.example.catapult.datastore.UserData
 import com.example.catapult.model.user.profile.ProfileContract
 import com.example.catapult.model.user.profile.ProfileViewModel
-import kotlinx.serialization.json.Json
 import java.sql.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -48,14 +47,10 @@ fun NavGraphBuilder.profileScreen(
     route = route,
     arguments = arguments
 ) { backStackEntry ->
-    val userJson = backStackEntry.arguments?.getString("user")
-    val user = Json.decodeFromString<UserData>(userJson ?: "")
-
-    val profileViewModel = hiltViewModel<ProfileViewModel>()
+    val profileViewModel = hiltViewModel<ProfileViewModel>(backStackEntry)
     val state by profileViewModel.state.collectAsState()
 
     ProfileScreen(
-        user = user,
         state = state,
         onBackClick = { navController.popBackStack() }
     )
@@ -65,7 +60,6 @@ fun NavGraphBuilder.profileScreen(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProfileScreen(
-    user: UserData,
     state: ProfileContract.ProfileState,
     onBackClick: () -> Unit
 ) {
@@ -93,7 +87,7 @@ fun ProfileScreen(
             Column(modifier = Modifier
                 .padding(16.dp)
                 .verticalScroll(rememberScrollState())) {
-                UserInfo(user)
+                UserInfo(state.currentUser)
                 Spacer(modifier = Modifier.height(16.dp))
                 QuizHistory(state)
                 Spacer(modifier = Modifier.height(16.dp))
