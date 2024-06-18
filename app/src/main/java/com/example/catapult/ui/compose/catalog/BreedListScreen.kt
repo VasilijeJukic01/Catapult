@@ -1,4 +1,4 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -20,7 +20,7 @@ import androidx.compose.ui.res.*
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.tooling.preview.*
 import androidx.compose.ui.unit.*
-import androidx.lifecycle.viewmodel.compose.*
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.*
 import androidx.navigation.compose.*
 import com.example.catapult.R
@@ -29,7 +29,28 @@ import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListState
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListUiEvent
 import com.example.catapult.model.catalog.list.BreedListViewModel
+import com.example.catapult.ui.compose.BreedCard
 import com.example.catapult.ui.theme.*
+
+// Navigation
+@OptIn(ExperimentalMaterial3Api::class)
+fun NavGraphBuilder.breedsListScreen(
+    route: String,
+    navController: NavController,
+) = composable (route = route) {
+    val breedListViewModel = hiltViewModel<BreedListViewModel>()
+    val state by breedListViewModel.state.collectAsState()
+
+    BreedListScreen(
+        state = state,
+        eventPublisher = {
+            breedListViewModel.setEvent(it)
+        },
+        onClick = { breed ->
+            navController.navigate(route = "breeds/${breed.id}")
+        },
+    )
+}
 
 @ExperimentalMaterial3Api
 @Composable
@@ -169,29 +190,6 @@ private fun DisplayEmptyStateOrError(state: BreedListState) {
             }
         }
     }
-}
-
-// Navigation
-@OptIn(ExperimentalMaterial3Api::class)
-fun NavGraphBuilder.breedsListScreen(
-    route: String,
-    navController: NavController,
-) = composable (route = route) {
-
-    val breedListViewModel = viewModel<BreedListViewModel>()
-
-    // Transforms state into state that can be observed by Compose
-    val state by breedListViewModel.state.collectAsState()
-
-    BreedListScreen(
-        state = state,
-        eventPublisher = {
-            breedListViewModel.setEvent(it)
-        },
-        onClick = { breed ->
-            navController.navigate(route = "breeds/${breed.id}")
-        },
-    )
 }
 
 // Preview

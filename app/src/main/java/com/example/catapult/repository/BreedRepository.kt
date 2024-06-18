@@ -1,60 +1,37 @@
 package com.example.catapult.repository
 
-import android.util.Log
-import com.example.catapult.api.BreedsApi
-import com.example.catapult.api.networking.retrofit
-import com.example.catapult.database.CatapultDatabase
 import com.example.catapult.model.catalog.UIBreed
-import com.example.catapult.model.mappers.asBreedDbModel
-import com.example.catapult.model.mappers.asBreedImageDbModel
-import com.example.catapult.model.mappers.asViewBreed
-import kotlinx.coroutines.async
-import kotlinx.coroutines.coroutineScope
+import com.example.catapult.api.BreedsApi
+import com.example.catapult.database.AppDatabase
+import com.example.catapult.debug.ErrorTracker
+import com.example.catapult.model.quiz.GuessCatQuestion
+import com.example.catapult.model.quiz.GuessFactQuestion
+import com.example.catapult.model.quiz.LeftOrRightQuestion
+import com.example.catapult.repository.fetchers.BreedFetcher
+import com.example.catapult.repository.fetchers.QuizGenerator
+import javax.inject.Inject
 
-object BreedRepository {
+class BreedRepository @Inject constructor(
+    private val breedsApi: BreedsApi,
+    private val database: AppDatabase,
+    private val errorTracker: ErrorTracker
+) {
 
-    // Attributes
-    private val database by lazy { CatapultDatabase.database }
-    private val breedsApi: BreedsApi by lazy { retrofit.create(BreedsApi::class.java) }
+    private val breedFetcher = BreedFetcher(database, breedsApi)
+    private val quizGenerator = QuizGenerator(breedFetcher, errorTracker)
 
-    // Methods
-    suspend fun fetchAllBreeds() = coroutineScope {
-        val breeds = breedsApi.getAllBreeds()
-        database.breedDao().insertAll(breeds.map { it.asBreedDbModel() })
-
-        breeds.map { breed ->
-            async {
-                try {
-                    fetchBreedImages(breed.id)
-                } catch (e: Exception) {
-                    Log.e("BreedRepository", "Failed to fetch images for breed ${breed.id}, error: ${e.message}")
-                }
-            }
-        }.forEach { it.await() }
-    }
-
-    private suspend fun fetchBreedImages(breedId: String) {
-        val breedImages = breedsApi.getImages(breedId)
-        breedImages.forEach { it.breedId = breedId }
-
-        database.breedImageDao().insertAll(breedImages.map { it.asBreedImageDbModel() })
-    }
+    suspend fun fetchAllBreeds() = breedFetcher.fetchAllBreeds()
 
     fun observeAllBreeds() = database.breedDao().observeAll()
+    fun fetchBreedDetails(breedId: String): UIBreed? = breedFetcher.fetchBreedDetails(breedId)
+    fun allBreeds(): List<UIBreed> = breedFetcher.allBreeds()
+    fun allImagesForBreed(breedId: String) = breedFetcher.allImagesForBreed(breedId)
+    fun getImageById(id: String) = breedFetcher.getImageById(id)
+    fun getById(id: String): UIBreed? = breedFetcher.getById(id)
 
-    fun fetchBreedDetails(breedId: String): UIBreed? {
-        return database.breedDao().getBreedById(breedId)?.asViewBreed()
-    }
-
-    // Getters
-    fun allBreeds() : List<UIBreed> = database.breedDao().getAll().map { it.asViewBreed() }
-
-    fun allImagesForBreed(breedId: String) = database.breedImageDao().getAllImagesForBreed(breedId)
-
-    fun getImageById(id: String) = database.breedImageDao().getImageById(id)
-
-    fun getById(id: String) : UIBreed? {
-        return database.breedDao().getBreedById(id)?.asViewBreed()
-    }
+    // Quiz Getters
+    suspend fun guessTheCatFetch(): List<GuessCatQuestion> = quizGenerator.guessTheCatFetch()
+    suspend fun guessTheFactFetch(): List<GuessFactQuestion> = quizGenerator.guessTheFactFetch()
+    suspend fun leftOrRightFetch(): List<LeftOrRightQuestion> = quizGenerator.leftOrRightFetch()
 
 }

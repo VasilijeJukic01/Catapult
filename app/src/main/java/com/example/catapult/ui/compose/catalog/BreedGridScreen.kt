@@ -1,7 +1,9 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -13,24 +15,24 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
+import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.catalog.UIBreedImage
 import com.example.catapult.model.catalog.grid.BreedGridContract
 import com.example.catapult.model.catalog.grid.BreedGridViewModel
+import com.example.catapult.ui.compose.AppIconButton
 
 // Navigation
 fun NavGraphBuilder.breedImagesGrid(
@@ -42,14 +44,7 @@ fun NavGraphBuilder.breedImagesGrid(
     val breedId = navBackStackEntry.arguments?.getString("breedId")
         ?: throw IllegalStateException("breedId required")
 
-    val breedGridViewModel = viewModel<BreedGridViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BreedGridViewModel(breedId = breedId) as T
-            }
-        }
-    )
+    val breedGridViewModel = hiltViewModel<BreedGridViewModel>(navBackStackEntry)
 
     val onImageClick: (String) -> Unit = { imageId ->
         navController.navigate("breeds/gallery/${breedId}?currentImage=$imageId")
@@ -71,8 +66,8 @@ fun BreedGridScreen(
 ) {
     Scaffold(
         topBar = {
-            MediumTopAppBar(
-                title = { Text(text = "Images") },
+            TopAppBar(
+                title = { },
                 navigationIcon = {
                     AppIconButton(
                         imageVector = Icons.Default.ArrowBack,
@@ -109,10 +104,17 @@ fun BreedGridScreen(
                                 .size(cellSize)
                                 .clickable { onImageClick(image.id) },
                         ) {
-                            ImagePreview(
+                            Box(
                                 modifier = Modifier.fillMaxSize(),
-                                image = image,
-                            )
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Image(
+                                    painter = rememberAsyncImagePainter(image.url),
+                                    contentDescription = "Breed Image",
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentScale = ContentScale.Crop
+                                )
+                            }
                         }
                     }
                 }

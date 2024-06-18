@@ -1,26 +1,64 @@
 package com.example.catapult.navigation
 
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.catapult.ui.compose.breedDetailsScreen
-import com.example.catapult.ui.compose.breedsListScreen
-import com.example.catapult.ui.compose.breedGalleryScreen
-import com.example.catapult.ui.compose.breedImagesGrid
+import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
+import com.example.catapult.ui.compose.user.loginScreen
+import com.example.catapult.ui.compose.catalog.*
+import com.example.catapult.ui.compose.chooseScreen
+import com.example.catapult.ui.compose.quiz.*
+import com.example.catapult.ui.compose.user.addUserScreen
+import com.example.catapult.ui.compose.user.editUserScreen
+import com.example.catapult.ui.compose.user.profileScreen
 
 @Composable
 fun AppNavigation() {
-
     val navController = rememberNavController()
+    val viewModel = hiltViewModel<NavigationViewModel>()
+    val state by viewModel.state.collectAsState()
+    val startDestination = remember { mutableStateOf("loading") }
+
+    LaunchedEffect(state.isLoggedIn) {
+        startDestination.value = if (state.isLoggedIn) "choose" else "login"
+    }
 
     NavHost(
         navController = navController,
-        startDestination = "breeds",
+        startDestination = startDestination.value,
+     //   enterTransition = { slideInHorizontally {it } },
+      //  exitTransition = { scaleOut (targetScale = 0.75f) },
+       // popEnterTransition = { scaleIn(initialScale = 0.75f) },
+      //  popExitTransition = { slideOutHorizontally { it} },
     ) {
-        // Routes
-        breedsListScreen (
+        composable(route = "loading") {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                CircularProgressIndicator()
+            }
+        }
+        chooseScreen(
+            route = "choose",
+            navController = navController
+        )
+        loginScreen(
+            route = "login",
+            navController = navController,
+        )
+        breedsListScreen(
             route = "breeds",
             navController = navController,
         )
@@ -53,6 +91,43 @@ fun AppNavigation() {
             ),
             onClose = { navController.navigateUp() }
         )
+        guessTheFactScreen(
+            route = "guessTheFact",
+            navController = navController,
+        )
+        guessTheCatScreen(
+            route = "guessTheCat",
+            navController = navController,
+        )
+        leftOrRightScreen(
+            route = "leftOrRight",
+            navController = navController,
+        )
+        quizEndScreen(
+            route = "quizEndScreen",
+            navController = navController,
+        )
+        leaderboardScreen(
+            route = "leaderboard",
+            navController = navController,
+        )
+        profileScreen(
+            route = "profile/{user}",
+            arguments = listOf(
+                navArgument("user") { type = NavType.StringType }
+            ),
+            navController = navController
+        )
+        editUserScreen(
+            route = "editUser/{user}",
+            arguments = listOf(
+                navArgument("user") { type = NavType.StringType }
+            ),
+            navController = navController
+        )
+        addUserScreen(
+            route = "addUser",
+            navController = navController,
+        )
     }
-
 }

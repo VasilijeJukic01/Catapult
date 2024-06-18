@@ -1,4 +1,4 @@
-package com.example.catapult.ui.compose
+package com.example.catapult.ui.compose.catalog
 
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
@@ -10,22 +10,22 @@ import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.MediumTopAppBar
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NamedNavArgument
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.catapult.model.catalog.gallery.BreedGalleryContract
 import com.example.catapult.model.catalog.gallery.BreedGalleryViewModel
+import com.example.catapult.ui.compose.AppIconButton
+import com.example.catapult.ui.compose.ImagePreview
 
 // Navigation
 fun NavGraphBuilder.breedGalleryScreen(
@@ -38,20 +38,7 @@ fun NavGraphBuilder.breedGalleryScreen(
     enterTransition = { slideInVertically { it } },
     popExitTransition = { slideOutVertically { it } },
 ) { navBackStackEntry ->
-    val breedId = navBackStackEntry.arguments?.getString("breedId")
-        ?: throw IllegalStateException("breedId required")
-    val currentImage = navBackStackEntry.arguments?.getString("currentImage")
-        ?: throw IllegalStateException("currentImage required")
-
-    val breedGalleryViewModel = viewModel<BreedGalleryViewModel>(
-        factory = object : ViewModelProvider.Factory {
-            @Suppress("UNCHECKED_CAST")
-            override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return BreedGalleryViewModel(breedId = breedId, currentImage = currentImage) as T
-            }
-        }
-    )
-
+    val breedGalleryViewModel = hiltViewModel<BreedGalleryViewModel>(navBackStackEntry)
     val state = breedGalleryViewModel.state.collectAsState()
 
     BreedGalleryScreen(
@@ -79,15 +66,14 @@ fun BreedGalleryScreen(
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            MediumTopAppBar(
+            TopAppBar(title = {},
+
                 navigationIcon = {
                     AppIconButton(
                         imageVector = Icons.Default.ArrowBack,
                         onClick = onClose,
                     )
-                },
-                title = {}
-            )
+                })
         },
         content = { paddingValues ->
             if (state.images.isNotEmpty()) {

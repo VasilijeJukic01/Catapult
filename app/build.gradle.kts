@@ -2,7 +2,7 @@ plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.jetbrainsKotlinAndroid)
     kotlin("plugin.serialization") version "1.9.22"
-
+    id("com.google.dagger.hilt.android")
     id("com.google.devtools.ksp") version "1.9.23-1.0.20"
 }
 
@@ -89,6 +89,16 @@ dependencies {
     implementation("androidx.room:room-ktx:$room_version")
     ksp("androidx.room:room-compiler:$room_version")
 
+    // DataStore
+    implementation("androidx.datastore:datastore:1.1.1")
+
+    // Hilt
+    val hiltVersion = "2.51"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    ksp("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    // Hilt Compose Navigation support (hiltViewModel factory)
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+
     // Retrofit
     implementation("com.squareup.retrofit2:retrofit:2.11.0")
     implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:1.0.0")
@@ -103,4 +113,38 @@ dependencies {
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // Testing
+    testImplementation(libs.junit)
+
+    testImplementation(libs.androidx.junit)
+    androidTestImplementation(libs.androidx.junit)
+
+    androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+
+    androidTestImplementation(libs.androidx.ui.test.junit4)
+    debugImplementation(libs.androidx.ui.tooling)
+    debugImplementation(libs.androidx.ui.test.manifest)
+
+
+    // kotest.io
+    // https://kotest.io/docs/framework/framework.html
+    testImplementation("io.kotest:kotest-assertions-core:5.9.0")
+
+    // mockk.io
+    // https://mockk.io/
+    val mockk = "1.13.10"
+    testImplementation("io.mockk:mockk:$mockk")
+    testImplementation("io.mockk:mockk-android:$mockk")
+    androidTestImplementation("io.mockk:mockk:$mockk")
+    androidTestImplementation("io.mockk:mockk-android:$mockk")
+
+    // Coroutines
+    // https://developer.android.com/kotlin/coroutines/test
+    testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
+
+    // Android testing
+    testImplementation("androidx.test:core-ktx:1.5.0")
+    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
 }

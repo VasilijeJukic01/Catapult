@@ -1,13 +1,6 @@
 package com.example.catapult.ui.compose
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material.icons.Icons
@@ -16,8 +9,11 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextFieldColors
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,11 +30,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.dummies.DataSample
 import com.example.catapult.ui.theme.CatalogTheme
-import com.example.catapult.ui.theme.cardColor
 import androidx.compose.ui.unit.*
 import coil.compose.SubcomposeAsyncImage
 import com.example.catapult.model.catalog.UIBreedImage
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.TextButton
+import androidx.compose.runtime.MutableState
 
+// BredCard
 @Composable
 fun BreedCard(
     uiBreed: UIBreed,
@@ -53,7 +53,7 @@ fun BreedCard(
             defaultElevation = 6.dp
         ),
         colors = CardDefaults.cardColors(
-            containerColor = cardColor
+            containerColor = MaterialTheme.colorScheme.primary
         )
     ) {
         // Name
@@ -64,7 +64,7 @@ fun BreedCard(
                     .padding()
                     .padding(10.dp),
                 textAlign = TextAlign.Left,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -107,7 +107,10 @@ fun BreedCard(
                 SuggestionChip(
                     onClick = {},
                     modifier = Modifier.padding(4.dp),
-                    label  = { Text(temperament) }
+                    label  = { Text(
+                        text = temperament,
+                        color = MaterialTheme.colorScheme.onPrimary
+                    ) }
                 )
             }
         }
@@ -128,6 +131,7 @@ fun BreedCard(
     }
 }
 
+// NoDataContent
 @Composable
 fun NoDataContent(
     id: String,
@@ -143,12 +147,13 @@ fun NoDataContent(
     }
 }
 
+// ImagePreview
 @Composable
 fun ImagePreview(
     modifier: Modifier,
     image: UIBreedImage,
 ) {
-    Box(modifier = modifier, contentAlignment = Alignment.BottomCenter) {
+    Box(modifier = modifier, contentAlignment = Alignment.Center) {
         SubcomposeAsyncImage(
             modifier = Modifier.fillMaxSize(),
             model = image.url,
@@ -163,23 +168,12 @@ fun ImagePreview(
                 }
             },
             contentDescription = null,
-            contentScale = ContentScale.FillWidth,
+            contentScale = ContentScale.Fit,
         )
     }
 }
 
-// Preview
-@Preview(showBackground = true)
-@Composable
-fun PreviewBreedCard() {
-    CatalogTheme {
-        BreedCard(
-            uiBreed = DataSample[0],
-            onClick = {},
-        )
-    }
-}
-
+// Icon Button
 @Composable
 fun AppIconButton(
     modifier: Modifier = Modifier,
@@ -196,6 +190,61 @@ fun AppIconButton(
             imageVector = imageVector,
             contentDescription = contentDescription,
             tint = tint,
+        )
+    }
+}
+
+// Quiz Exit Dialog
+@Composable
+fun ShowExitQuizDialog(showDialog: MutableState<Boolean>, onBackClick: () -> Unit) {
+    if (showDialog.value) {
+        AlertDialog(
+            onDismissRequest = { showDialog.value = false },
+            title = { Text("Exit Quiz") },
+            text = { Text("Are you sure you want to exit the quiz?") },
+            confirmButton = {
+                TextButton(onClick = {
+                    showDialog.value = false
+                    onBackClick()
+                }) {
+                    Text("Confirm")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDialog.value = false }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
+}
+
+// Transparent TextField
+@Composable
+fun transparentTextField(isError: Boolean = false): TextFieldColors {
+    return TextFieldDefaults.colors(
+        cursorColor = Color.Black,
+        focusedTextColor = Color.Black,
+        unfocusedTextColor = Color.Black,
+        unfocusedPlaceholderColor = Color.Black,
+        focusedPlaceholderColor = Color.Black,
+        errorTextColor = if (isError) Color.Black else Color.Transparent,
+        errorSupportingTextColor = if (isError) Color.Black else Color.Transparent,
+        focusedContainerColor = Color.Transparent,
+        focusedIndicatorColor = MaterialTheme.colorScheme.inversePrimary,
+        unfocusedContainerColor = Color.Transparent,
+        errorContainerColor = Color.Transparent
+    )
+}
+
+// Preview
+@Preview(showBackground = true)
+@Composable
+fun PreviewBreedCard() {
+    CatalogTheme {
+        BreedCard(
+            uiBreed = DataSample[0],
+            onClick = {},
         )
     }
 }

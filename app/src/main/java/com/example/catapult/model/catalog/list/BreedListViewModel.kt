@@ -14,6 +14,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListState
 import com.example.catapult.model.catalog.list.BreedListContract.BreedListUiEvent
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 /*
 Hot Flow - Type of flow that is active independently of the presence of collectors.
@@ -22,8 +24,9 @@ SharedFlow - Hot Flow that emits values to its collectors.
 StateFlow - Hot Flow that represents a state. It emits the current state to new collectors.
  */
 
-class BreedListViewModel (
-    private val repository: BreedRepository = BreedRepository
+@HiltViewModel
+class BreedListViewModel @Inject constructor (
+    private val repository: BreedRepository
 ) : ViewModel() {
 
     // State
