@@ -26,7 +26,6 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.encodeToJsonElement
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.filled.Face
 import androidx.compose.material.icons.filled.Star
@@ -38,8 +37,6 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.ui.compose.avatar.getAvatarResource
 import androidx.compose.material3.*
 
-// TODO: [PRIORITY HIGH] Refactor
-
 @Composable
 fun UserDrawer(
     drawerState: DrawerState,
@@ -48,43 +45,44 @@ fun UserDrawer(
 ) {
     val uiScope = rememberCoroutineScope()
     val viewModel = hiltViewModel<UserDrawerViewModel>()
+    val state = viewModel.state.collectAsState()
 
     BackHandler(enabled = drawerState.isOpen) {
         uiScope.launch {
             drawerState.close()
         }
     }
-    val uiState = viewModel.state.collectAsState()
 
-    if (uiState.value.loginRedirect) {
+    if (state.value.loginRedirect) {
         navController.navigate("login")
     } else
         AppDrawer(
-            state = uiState.value,
+            state = state.value,
             onDrawerDestinationClick = {
                 uiScope.launch { drawerState.close() }
-                val destination = when (it) {
+                when (it) {
+                    // Navigate to Profile
                     is UserDrawerDestination.Profile -> {
                         val userJson = Json.encodeToJsonElement(it.user)
                         navController.navigate("profile/$userJson")
                     }
-
+                    // Navigate to Edit Profile
                     is UserDrawerDestination.EditProfile -> {
                         val userJson = Json.encodeToJsonElement(it.user)
                         navController.navigate("editUser/$userJson")
                     }
-
+                    // Navigate to Add Profile
                     is UserDrawerDestination.AddProfile -> {
                         navController.navigate("addUser")
                     }
-
+                    // Navigate to Leaderboard
                     is UserDrawerDestination.Leaderboard -> {
                         navController.navigate("leaderboard")
                     }
                 }
                 onDrawerDestinationClick(it)
             },
-            eventPublisher = {},
+            eventPublisher = { viewModel.setEvent(it) },
             navController = navController,
         )
 }
@@ -95,81 +93,21 @@ fun AppDrawer(
     eventPublisher: (DrawerUiEvent) -> Unit,
     navController: NavController,
     onDrawerDestinationClick: (UserDrawerDestination) -> Unit,
-    userDrawerViewModel: UserDrawerViewModel = hiltViewModel(),
 ) {
-
     val logoutDialog = remember { mutableStateOf(false) }
     val switchProfileDialog = remember { mutableStateOf(false) }
-    val remainingUsers = state.accounts.collectAsState(initial = emptyList()).value
 
-    if (logoutDialog.value) {
-        AlertDialog(
-            onDismissRequest = { logoutDialog.value = false },
-            title = { Text("Logout") },
-            text = { Text("Are you sure you want to logout?") },
-            confirmButton = {
-                TextButton(onClick = {
-                    logoutDialog.value = false
-                    userDrawerViewModel.setEvent(DrawerUiEvent.Logout(state.currentAccount))
-                    if (state.loginRedirect) {
-                        navController.navigate("login")
-                    } else {
-                        eventPublisher(DrawerUiEvent.SwitchAccount(remainingUsers.first()))
-                    }
-                }) {
-                    Text("Confirm")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { logoutDialog.value = false }) {
-                    Text("Cancel")
-                }
-            }
-        )
-    }
+    // Dialog Handlers
+    ShowLogoutDialog(logoutDialog, state, navController, eventPublisher)
+    ShowSwitchProfileDialog(switchProfileDialog, state, eventPublisher)
 
-    if (switchProfileDialog.value) {
-        AlertDialog(
-            onDismissRequest = { switchProfileDialog.value = false },
-            title = { Text("Switch Profile") },
-            text = {
-                val users = state.accounts.collectAsState(initial = emptyList()).value
-                LazyColumn {
-                    items(users.size) { index ->
-                        val user = users[index]
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    userDrawerViewModel.setEvent(DrawerUiEvent.SwitchAccount(user))
-                                    switchProfileDialog.value = false
-                                }
-                                .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Spacer(modifier = Modifier.width(8.dp))
-
-                            Text(
-                                text = user.nickname,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        }
-                    }
-                }
-            },
-            confirmButton = {}
-        )
-
-    }
-
-
-
+    // Content
     BoxWithConstraints {
         ModalDrawerSheet(
             modifier = Modifier.width(maxWidth * 3 / 4),
         ) {
+            // Core
             Column {
-
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -181,7 +119,6 @@ fun AppDrawer(
                         style = MaterialTheme.typography.bodyLarge,
                     )
                 }
-
                 Column(modifier = Modifier.weight(1f)) {
                     // Avatar
                     Box(
@@ -190,33 +127,22 @@ fun AppDrawer(
                             .clickable { onDrawerDestinationClick(UserDrawerDestination.Profile(state.currentAccount.nickname)) }
                             .padding(16.dp),
                     ) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
                             val avatarUri = state.currentAccount.avatar
-                            if (avatarUri.contains("@Default")) {
-                                val avatar: Painter = painterResource(id = getAvatarResource(avatarUri))
-                                Image(
-                                    painter = avatar,
-                                    contentDescription = "Avatar Icon",
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.surface),
-                                    contentScale = ContentScale.Crop
-                                )
+                            val avatar: Painter = if (avatarUri.contains("@Default")) {
+                                painterResource(id = getAvatarResource(avatarUri))
                             } else {
-                                val avatar: Painter = rememberAsyncImagePainter(model = avatarUri)
-                                Image(
-                                    painter = avatar,
-                                    contentDescription = "Avatar Icon",
-                                    modifier = Modifier
-                                        .size(48.dp)
-                                        .clip(CircleShape)
-                                        .background(MaterialTheme.colorScheme.surface),
-                                    contentScale = ContentScale.Crop
-                                )
+                                rememberAsyncImagePainter(model = avatarUri)
                             }
+                            Image(
+                                painter = avatar,
+                                contentDescription = "Avatar Icon",
+                                modifier = Modifier
+                                    .size(48.dp)
+                                    .clip(CircleShape)
+                                    .background(MaterialTheme.colorScheme.surface),
+                                contentScale = ContentScale.Crop
+                            )
                             Spacer(modifier = Modifier.width(16.dp))
                             Text(
                                 text = state.currentAccount.nickname,
@@ -224,34 +150,33 @@ fun AppDrawer(
                             )
                         }
                     }
-
+                    // Add Profile
                     AppDrawerActionItem(
                         icon = Icons.Default.Add,
                         text = "Add Profile",
                         onClick = { onDrawerDestinationClick(UserDrawerDestination.AddProfile) },
                     )
-
+                    // Edit Profile
                     AppDrawerActionItem(
                         icon = Icons.Default.Edit,
                         text = "Edit Profile",
                         onClick = { onDrawerDestinationClick(UserDrawerDestination.EditProfile(state.currentAccount.nickname)) },
                     )
-
+                    // Switch Profile
                     AppDrawerActionItem(
                         icon = Icons.Default.Face,
                         text = "Switch Profile",
                         onClick = { switchProfileDialog.value = true },
                     )
-
+                    // Leaderboard
                     AppDrawerActionItem(
                         icon = Icons.Default.Star,
                         text = "Leaderboard",
                         onClick = { onDrawerDestinationClick(UserDrawerDestination.Leaderboard) },
                     )
                 }
-
                 Divider(modifier = Modifier.fillMaxWidth())
-
+                // Logout
                 AppDrawerActionItem(
                     icon = Icons.Default.ExitToApp,
                     text = "Logout",
@@ -262,6 +187,7 @@ fun AppDrawer(
     }
 }
 
+// Drawer Action Item
 @Composable
 fun AppDrawerActionItem(
     icon: ImageVector,

@@ -5,16 +5,18 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.catapult.datastore.UserStore
 import com.example.catapult.ui.compose.leaderboard.leaderboardScreen
 import com.example.catapult.ui.compose.user.loginScreen
 import com.example.catapult.ui.compose.catalog.*
@@ -25,12 +27,14 @@ import com.example.catapult.ui.compose.user.editUserScreen
 import com.example.catapult.ui.compose.user.profileScreen
 
 @Composable
-fun AppNavigation(userStore: UserStore) {
+fun AppNavigation() {
     val navController = rememberNavController()
+    val viewModel = hiltViewModel<NavigationViewModel>()
+    val state by viewModel.state.collectAsState()
     val startDestination = remember { mutableStateOf("loading") }
 
-    LaunchedEffect(userStore) {
-        startDestination.value = if (userStore.isUserLoggedIn()) "choose" else "login"
+    LaunchedEffect(state.isLoggedIn) {
+        startDestination.value = if (state.isLoggedIn) "choose" else "login"
     }
 
     NavHost(

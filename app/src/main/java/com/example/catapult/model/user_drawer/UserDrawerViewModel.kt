@@ -1,6 +1,5 @@
 package com.example.catapult.model.user_drawer
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.datastore.UserData
@@ -58,7 +57,6 @@ class UserDrawerViewModel @Inject constructor(
 
             is DrawerUiEvent.Logout -> {
                 viewModelScope.launch {
-                    Log.e("UserDrawerViewModel", "Logout ${event.user}")
                     userStore.deleteUser(event.user)
                     val remainingUsers = userStore.getAllUsers().first()
                     if (remainingUsers.isNotEmpty()) {
@@ -71,6 +69,7 @@ class UserDrawerViewModel @Inject constructor(
         }
     }
 
+    // Fetch
     private fun fetchUsersDrawerData(userStore: UserStore) {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {

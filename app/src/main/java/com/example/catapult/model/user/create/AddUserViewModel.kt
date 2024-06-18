@@ -37,8 +37,8 @@ class AddUserViewModel @Inject constructor(
 
     private suspend fun handleEvent(event: AddUserUiEvent) {
         when (event) {
-            // Change Profile
-            is AddUserUiEvent.OnSubmitClick -> {
+            // Add Profile
+            is AddUserUiEvent.AddUser -> {
                 val user = UserData(getRandomAvatar(), event.firstName, event.lastName, event.nickname, event.email, 1)
                 store.addUserData(user)
             }

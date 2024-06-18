@@ -1,13 +1,5 @@
 package com.example.catapult.ui.compose.leaderboard
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -26,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
@@ -33,11 +26,8 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import com.example.catapult.model.leaderboard.LeaderboardViewModel
 import com.example.catapult.model.leaderboard.LeaderboardContract.*
-import com.example.catapult.ui.theme.leaderboardCol1
-import com.example.catapult.ui.theme.leaderboardCol2
-import com.example.catapult.ui.theme.leaderboardCol3
-import com.example.catapult.ui.theme.leaderboardCol4
-import com.example.catapult.ui.theme.leaderboardCol5
+import com.example.catapult.ui.theme.*
+import androidx.compose.foundation.layout.*
 
 // Navigation
 fun NavGraphBuilder.leaderboardScreen(
@@ -117,6 +107,36 @@ fun LeaderboardScreen(
                     .fillMaxSize()
                     .padding(top = 8.dp)
             ) {
+                item {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = "Position",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "Nickname",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "Result",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                        Text(
+                            text = "Total Games",
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = Color.Black
+                        )
+                    }
+                }
                 items(state.leaderboard) { item ->
                     val color = when (item.position) {
                         1 -> leaderboardCol1
@@ -152,6 +172,11 @@ fun LeaderboardScreen(
                             )
                             Text(
                                 text = item.result.toString(),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                            Text(
+                                text = item.totalGamesSubmitted.toString(),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onBackground
                             )

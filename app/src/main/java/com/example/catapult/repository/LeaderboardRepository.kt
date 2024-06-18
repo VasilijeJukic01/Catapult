@@ -41,6 +41,10 @@ class LeaderboardRepository @Inject constructor(
     // Getters
     fun getLeaderboardData(categoryId: Int) = database.leaderboardDao().getAllLeaderboardDataCategory(categoryId)
 
+    fun getTotalSubmittedGamesForUser(nickname: String): Int {
+        return database.leaderboardDao().countTotalSubmittedGamesForUser(nickname)
+    }
+
     fun getBestGlobalPositionForUser(nickname: String): Triple<Int, Int, Int> {
         val positions = (1..3).map { categoryId ->
             database.leaderboardDao().getBestGlobalPositionForUser(nickname, categoryId) ?: -1

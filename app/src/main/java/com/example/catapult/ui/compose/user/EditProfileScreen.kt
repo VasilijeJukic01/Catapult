@@ -241,7 +241,7 @@ fun EditUserScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
-                                eventPublisher(OnSubmitClick(selectedImageUri.toString(), firstName, lastName, nickname, email))
+                                eventPublisher(EditUser(selectedImageUri.toString(), firstName, lastName, nickname, email))
                                 onSubmitClick()
                             }
                         },

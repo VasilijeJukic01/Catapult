@@ -3,7 +3,7 @@ package com.example.catapult.model.user.create
 interface AddUserContract {
 
     sealed class AddUserUiEvent {
-        data class OnSubmitClick(
+        data class AddUser(
             val avatar: String,
             val firstName: String,
             val lastName: String,

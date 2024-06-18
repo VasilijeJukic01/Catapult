@@ -58,7 +58,11 @@ class LeaderboardViewModel @Inject constructor(
             is LeaderboardUiEvent.SelectCategory -> {
                 withContext(Dispatchers.IO) {
                     val leaderboardData: List<UILeaderboardData> = repository.getLeaderboardData(event.category).asLeaderboardUiModel()
-                    setState { copy(leaderboard = leaderboardData) }
+                    val updatedLeaderboardData = leaderboardData.map { data ->
+                        val totalGames = repository.getTotalSubmittedGamesForUser(data.nickname)
+                        data.copy(totalGamesSubmitted = totalGames)
+                    }
+                    setState { copy(leaderboard = updatedLeaderboardData) }
                 }
             }
         }

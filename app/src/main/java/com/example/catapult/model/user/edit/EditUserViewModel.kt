@@ -53,7 +53,7 @@ class EditUserViewModel @Inject constructor(
     private suspend fun handleEvent(event: EditUserUiEvent) {
         when (event) {
             // Edit Profile
-            is EditUserUiEvent.OnSubmitClick -> {
+            is EditUserUiEvent.EditUser -> {
                 val user = UserData(event.avatar, event.firstName, event.lastName, event.nickname, event.email,1)
                 store.updateUserData(user)
             }

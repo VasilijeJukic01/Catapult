@@ -9,7 +9,7 @@ interface EditUserContract {
     )
 
     sealed class EditUserUiEvent {
-        data class OnSubmitClick(
+        data class EditUser(
             val avatar: String,
             val firstName: String,
             val lastName: String,

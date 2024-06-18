@@ -94,6 +94,11 @@ fun AddProfileScreen(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.Center
                 ) {
+                    Text(
+                        text = "Add Profile",
+                        style = MaterialTheme.typography.titleLarge,
+                        modifier = Modifier.padding(bottom = 16.dp)
+                    )
                     // First Name
                     TextField(
                         value = firstName,
@@ -167,7 +172,7 @@ fun AddProfileScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
-                                eventPublisher(OnSubmitClick("", firstName, lastName, nickname, email))
+                                eventPublisher(AddUser("", firstName, lastName, nickname, email))
                                 onSubmitClick()
                             }
                         },

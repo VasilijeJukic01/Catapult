@@ -1,49 +1,23 @@
 package com.example.catapult.datastore
 
 import androidx.datastore.core.DataStore
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
-
-// TODO: [PRIORITY LOW] Refactor
 
 @Singleton
 class UserStore @Inject constructor(
     private val persistence: DataStore<List<UserData>>
 ) {
 
-    private val scope = CoroutineScope(Dispatchers.IO)
-
-    val userData: Flow<List<UserData>> = persistence.data
-        .stateIn(
-            scope = scope,
-            started = SharingStarted.Eagerly,
-            initialValue = runBlocking { persistence.data.first() },
-        )
-
     suspend fun addUserData(newUserData: UserData) {
         persistence.updateData { currentUsers ->
-            val updatedUsers = currentUsers.map { user ->
-                user.copy(active = 0)
-            }.toMutableList()
+            val updatedUsers = currentUsers
+                .map { user -> user.copy(active = 0) }
+                .toMutableList()
             updatedUsers.add(newUserData)
             updatedUsers
         }
-    }
-
-    suspend fun switchUser(activeUser: UserData) {
-        persistence.updateData { currentUsers ->
-            currentUsers.map { user ->
-                user.copy(active = if (user == activeUser) 1 else 0)
-            }
-        }
-    }
-
-    suspend fun setUserData(newUserData: UserData) {
-        persistence.updateData { listOf(newUserData) }
     }
 
     suspend fun updateUserData(updatedUserData: UserData) {
@@ -54,12 +28,16 @@ class UserStore @Inject constructor(
         }
     }
 
-    suspend fun getUser(): UserData? {
-        return persistence.data.firstOrNull()?.firstOrNull()
+    suspend fun setUserData(newUserData: UserData) {
+        persistence.updateData { listOf(newUserData) }
     }
 
-    fun getAllUsers(): Flow<List<UserData>> {
-        return persistence.data
+    suspend fun switchUser(activeUser: UserData) {
+        persistence.updateData { currentUsers ->
+            currentUsers.map { user ->
+                user.copy(active = if (user == activeUser) 1 else 0)
+            }
+        }
     }
 
     suspend fun deleteUser(userToDelete: UserData) {
@@ -76,6 +54,10 @@ class UserStore @Inject constructor(
                     user.nickname.isNotEmpty() &&
                     user.email.isNotEmpty()
         }
+    }
+
+    fun getAllUsers(): Flow<List<UserData>> {
+        return persistence.data
     }
 
     suspend fun getActiveUser(): UserData {
