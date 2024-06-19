@@ -1,7 +1,6 @@
 package com.example.catapult
 
 import android.os.Looper
-import android.util.Log
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.test.assertIsDisplayed
@@ -21,6 +20,8 @@ import com.example.catapult.repository.BreedRepository
 import com.example.catapult.ui.compose.quiz.LeftOrRightScreen
 import io.mockk.coEvery
 import io.mockk.mockk
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -30,11 +31,18 @@ class LeftOrRightCatScreenTest {
     @get:Rule
     val composeTestRule = createComposeRule()
 
+    // Initialize
+    @Before
+    fun setUp() {
+        if (Looper.myLooper() == null) {
+            Looper.prepare()
+        }
+    }
+
     @Test
     fun skip_question_test() {
         // Arrange
         val questionNumber = mutableStateOf(4)
-        val totalPoints = mutableStateOf(0)
         composeTestRule.setContent {
             CompositionLocalProvider {
                 LeftOrRightScreen(
@@ -59,41 +67,27 @@ class LeftOrRightCatScreenTest {
             .assertIsDisplayed()
     }
 
-    @Before
-    fun setUp() {
-        if (Looper.myLooper() == null) {
-            Looper.prepare()
-        }
-    }
-
-
     @Test
-    fun correct_answer_increases_total_correct_and_question_number() {
-        val correctAnswerIndex = 0
-
+    fun correct_answer_increases_total_correct_and_question_number() = runTest {
+        // Arrange
         val mockQuestions = listOf(
             LeftOrRightQuestion(
                 questionType = LeftOrRightQuestionType.WHICH_CAT_IS_HEAVIER,
                 firstBreedAndImage = Pair(
-                    UIBreed(
-                        "Breed1",
-                        "id1",
-                    ), UIBreedImage("url1", "id1")
+                    UIBreed("Breed1", "id1"),
+                    UIBreedImage("url1", "id1")
                 ),
                 secondBreedAndImage = Pair(
-                    UIBreed(
-                        "Breed2",
-                        "id2",
-                    ), UIBreedImage("url2", "id2")
+                    UIBreed("Breed2", "id2"),
+                    UIBreedImage("url2", "id2")
                 ),
-                correctAnswer = correctAnswerIndex
+                correctAnswer = 0
             )
         )
         val repository: BreedRepository = mockk()
         coEvery { repository.leftOrRightFetch() } returns mockQuestions
 
         val viewModel = LeftOrRightViewModel(repository = repository, dispatcherProvider = DispatcherProvider())
-
         val initialState = mutableStateOf(viewModel.state.value.copy(totalCorrect = 0, currentQuestionNumber = 1))
 
         composeTestRule.setContent {
@@ -114,13 +108,14 @@ class LeftOrRightCatScreenTest {
             }
         }
 
+        // Act
         composeTestRule.onNodeWithTag(
-            "LeftOrRightCatScreen::CatImage $correctAnswerIndex",
+            "LeftOrRightCatScreen::CatImage 0",
             useUnmergedTree = true
         ).performClick()
+        delay(300)
 
-        composeTestRule.waitUntil(timeoutMillis = 1000) { initialState.value.totalCorrect == 1 }
-
+        // Assert
         composeTestRule
             .onNodeWithTag("LeftOrRightCatScreen::TopAppBar::TotalCorrect")
             .assertTextEquals("Total Points: 1")

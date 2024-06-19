@@ -118,6 +118,9 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+    testImplementation("junit:junit:4.13.2")
+    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+    androidTestImplementation("androidx.test:runner:1.5.2")
 
     testImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.junit)
@@ -128,7 +131,6 @@ dependencies {
     androidTestImplementation(libs.androidx.ui.test.junit4)
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
-
 
     // kotest.io
     // https://kotest.io/docs/framework/framework.html
@@ -145,8 +147,4 @@ dependencies {
     // Coroutines
     // https://developer.android.com/kotlin/coroutines/test
     testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:1.8.0")
-
-    // Android testing
-    testImplementation("androidx.test:core-ktx:1.5.0")
-    testImplementation("androidx.test.ext:junit-ktx:1.1.5")
 }

@@ -1,5 +1,6 @@
-package com.example.catapult.coroutines
+package com.example.catapult.rules
 
+import com.example.catapult.coroutines.DispatcherProvider
 import io.mockk.every
 import io.mockk.mockk
 import kotlinx.coroutines.Dispatchers

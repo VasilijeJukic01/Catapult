@@ -18,7 +18,7 @@ data class BreedImage (
     @PrimaryKey
     val id: String,
     val breedId: String,
-    val url: String,
-    val width: Int,
-    val height: Int
+    val url: String = "",
+    val width: Int = 1,
+    val height: Int = 1
 )
