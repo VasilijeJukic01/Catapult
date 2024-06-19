@@ -1,6 +1,10 @@
 package com.example.catapult.ui.compose.user
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -45,7 +49,11 @@ fun NavGraphBuilder.profileScreen(
     navController: NavController
 ) = composable(
     route = route,
-    arguments = arguments
+    arguments = arguments,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
 ) { backStackEntry ->
     val profileViewModel = hiltViewModel<ProfileViewModel>(backStackEntry)
     val state by profileViewModel.state.collectAsState()

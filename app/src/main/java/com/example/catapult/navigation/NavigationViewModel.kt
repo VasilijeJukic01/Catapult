@@ -3,6 +3,7 @@ package com.example.catapult.navigation
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.catapult.datastore.UserStore
+import com.example.catapult.repository.BreedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +15,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
-    private val store: UserStore
+    private val store: UserStore,
+    private val repository: BreedRepository
 ): ViewModel() {
 
     // State
@@ -32,6 +34,7 @@ class NavigationViewModel @Inject constructor(
             withContext(Dispatchers.IO) {
                 val isLoggedIn = store.isUserLoggedIn()
                 setState { copy(isLoggedIn = isLoggedIn) }
+                repository.fetchAllBreeds()
             }
         }
     }

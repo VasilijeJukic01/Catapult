@@ -1,5 +1,9 @@
 package com.example.catapult.ui.compose.leaderboard
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -36,7 +40,13 @@ import androidx.compose.ui.text.style.TextAlign
 fun NavGraphBuilder.leaderboardScreen(
     route: String,
     navController: NavController
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val viewModel = hiltViewModel<LeaderboardViewModel>()
     val state by viewModel.state.collectAsState()
 

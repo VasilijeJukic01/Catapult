@@ -6,6 +6,10 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.icons.Icons
@@ -41,7 +45,13 @@ import com.example.catapult.ui.compose.NoDataContent
 fun NavGraphBuilder.breedDetailsScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) { navBackStackEntry ->
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) { navBackStackEntry ->
     val breedDetailsViewModel = hiltViewModel<BreedDetailsViewModel>(navBackStackEntry)
     val state = breedDetailsViewModel.state.collectAsState()
 

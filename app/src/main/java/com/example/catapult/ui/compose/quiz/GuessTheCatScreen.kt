@@ -7,6 +7,8 @@ import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -55,7 +57,13 @@ import androidx.compose.foundation.layout.*
 fun NavGraphBuilder.guessTheCatScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val guessCatViewModel = hiltViewModel<GuessCatViewModel>()
     val state by guessCatViewModel.state.collectAsState()
 

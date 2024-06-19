@@ -3,6 +3,10 @@ package com.example.catapult.ui.compose.user
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
@@ -49,7 +53,11 @@ fun NavGraphBuilder.editUserScreen(
     navController: NavController,
 ) = composable(
     route = route,
-    arguments = arguments
+    arguments = arguments,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
 ) { backStackEntry ->
     val editUserViewModel = hiltViewModel<EditUserViewModel>(backStackEntry)
     val state by editUserViewModel.state.collectAsState()

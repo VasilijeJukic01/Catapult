@@ -1,5 +1,9 @@
 package com.example.catapult.ui.compose.user
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,7 +35,13 @@ import com.example.catapult.ui.theme.topBarColor
 fun NavGraphBuilder.addUserScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val addUserViewModel = hiltViewModel<AddUserViewModel>()
 
     AddProfileScreen(

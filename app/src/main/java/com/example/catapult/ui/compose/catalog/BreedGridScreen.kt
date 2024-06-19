@@ -1,5 +1,9 @@
 package com.example.catapult.ui.compose.catalog
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -40,7 +44,14 @@ fun NavGraphBuilder.breedImagesGrid(
     arguments: List<NamedNavArgument>,
     navController: NavController,
     onClose: () -> Unit,
-) = composable(route = route, arguments = arguments) { navBackStackEntry ->
+) = composable(
+    route = route,
+    arguments = arguments,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) { navBackStackEntry ->
     val breedId = navBackStackEntry.arguments?.getString("breedId")
         ?: throw IllegalStateException("breedId required")
 

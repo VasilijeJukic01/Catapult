@@ -82,7 +82,6 @@ class BreedListViewModel @Inject constructor (
             setState { copy(fetching = true) }
             try {
                 withContext(Dispatchers.IO) {
-                    repository.fetchAllBreeds()
                     val allBreeds = repository.allBreeds()
                     withContext(Dispatchers.Main) {
                         setState { copy(
