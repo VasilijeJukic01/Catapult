@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.left_or_right
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.coroutines.DispatcherProvider
 import com.example.catapult.model.quiz.LeftOrRightQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,7 +14,6 @@ import kotlinx.coroutines.launch
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightState
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
@@ -21,6 +21,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LeftOrRightViewModel @Inject constructor(
+    private val dispatcherProvider: DispatcherProvider,
     private val repository: BreedRepository
 ) : ViewModel() {
 
@@ -106,7 +107,7 @@ class LeftOrRightViewModel @Inject constructor(
     // Fetch
     private fun fetchLeftOrRightQuestions() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcherProvider.io()) {
                 val leftOrRightQuestions = repository.leftOrRightFetch()
                 val currentQuestion = leftOrRightQuestions.random()
 

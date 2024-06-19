@@ -23,6 +23,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -118,11 +119,13 @@ fun LeftOrRightContent(
                 ) {
                     Text(
                         text = "Question ${state.currentQuestionNumber} of 20",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag("LeftOrRightCatScreen::TopAppBar::CurrentQuestionNumber"),
                     )
                     Text(
                         text = "Total Points: ${state.totalCorrect}",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag("LeftOrRightCatScreen::TopAppBar::TotalCorrect"),
                     )
                     Text(
                         text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
@@ -162,13 +165,14 @@ fun LeftOrRightContent(
                                 modifier = Modifier
                                     .size(170.dp)
                                     .clickable { onCatImageClick(index) },
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Image(
                                     painter = rememberAsyncImagePainter(catImage.url),
                                     contentDescription = "Cat Image",
                                     modifier = Modifier
-                                        .fillMaxSize(),
+                                        .fillMaxSize()
+                                        .testTag("LeftOrRightCatScreen::CatImage $index"),
                                     contentScale = ContentScale.Crop
                                 )
                             }
@@ -178,7 +182,8 @@ fun LeftOrRightContent(
                 Button(
                     onClick = onSkipClick,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
                 ) {
                     Text("Skip Question")
 
