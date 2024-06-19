@@ -25,6 +25,7 @@ import com.example.catapult.R
 import com.example.catapult.model.user.create.AddUserContract.AddUserUiEvent
 import com.example.catapult.model.user.create.AddUserViewModel
 import com.example.catapult.ui.compose.transparentTextField
+import com.example.catapult.ui.theme.topBarColor
 
 // Navigation
 fun NavGraphBuilder.addUserScreen(
@@ -74,13 +75,21 @@ fun AddProfileScreen(
         Column {
             // TopAppBar
             TopAppBar(
-                title = { Text(text = "Back") },
+                title = {
+                    Text(
+                        text = "Back",
+                        color = Color.Black
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back",tint = Color.Black)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
             // Surface
