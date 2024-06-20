@@ -16,8 +16,8 @@ class AudioManager @Inject constructor(
 
     private val themeSong: MediaPlayer = MediaPlayer.create(context, R.raw.theme)
 
-    private val correctAnswerSound: MediaPlayer = MediaPlayer.create(context, R.raw.correct)
-    private val incorrectAnswerSound: MediaPlayer = MediaPlayer.create(context, R.raw.wrong)
+    private var correctAnswerSound: MediaPlayer = MediaPlayer.create(context, R.raw.correct)
+    private var incorrectAnswerSound: MediaPlayer = MediaPlayer.create(context, R.raw.wrong)
     private val gameEndSound: MediaPlayer = MediaPlayer.create(context, R.raw.end)
 
     fun playThemeSong() {
@@ -28,11 +28,23 @@ class AudioManager @Inject constructor(
     }
 
     fun playCorrectAnswerSound() {
-        correctAnswerSound.start()
+        try {
+            correctAnswerSound.start()
+        } catch (e: IllegalStateException) {
+            correctAnswerSound.release()
+            correctAnswerSound = MediaPlayer.create(context, R.raw.correct)
+            correctAnswerSound.start()
+        }
     }
 
     fun playIncorrectAnswerSound() {
-        incorrectAnswerSound.start()
+        try {
+            incorrectAnswerSound.start()
+        } catch (e: IllegalStateException) {
+            incorrectAnswerSound.release()
+            incorrectAnswerSound = MediaPlayer.create(context, R.raw.wrong)
+            incorrectAnswerSound.start()
+        }
     }
 
     fun playGameEndSound() {
