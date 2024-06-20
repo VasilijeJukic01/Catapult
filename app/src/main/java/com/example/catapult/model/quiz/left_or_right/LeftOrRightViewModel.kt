@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.left_or_right
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.coroutines.DispatcherProvider
 import com.example.catapult.model.quiz.LeftOrRightQuestionType
 import com.example.catapult.repository.BreedRepository
@@ -22,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LeftOrRightViewModel @Inject constructor(
     private val dispatcherProvider: DispatcherProvider,
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -75,6 +77,8 @@ class LeftOrRightViewModel @Inject constructor(
                         isCorrectAnswer = isCorrect
                     )
                 }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(LeftOrRightUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
@@ -102,6 +106,7 @@ class LeftOrRightViewModel @Inject constructor(
                 totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
             )
         }
+        audioManager.playGameEndSound()
     }
 
     // Fetch
@@ -132,5 +137,11 @@ class LeftOrRightViewModel @Inject constructor(
             }
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
+    }
+
 }
 

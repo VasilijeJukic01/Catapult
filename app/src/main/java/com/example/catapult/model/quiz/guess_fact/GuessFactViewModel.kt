@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.guess_fact
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.model.quiz.GuessFactQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GuessFactViewModel @Inject constructor (
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -70,6 +72,8 @@ class GuessFactViewModel @Inject constructor (
             is GuessTheFactUiEvent.SelectFact -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(GuessTheFactUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
@@ -99,6 +103,7 @@ class GuessFactViewModel @Inject constructor (
                 totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
             )
         }
+        audioManager.playGameEndSound()
     }
 
     private fun fetchGuessTheFactQuestions() {
@@ -128,6 +133,11 @@ class GuessFactViewModel @Inject constructor (
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
     }
 
 }

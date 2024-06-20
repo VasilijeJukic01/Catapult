@@ -18,6 +18,7 @@ class LeaderboardRepository @Inject constructor(
     // Core
     suspend fun fetchLeaderboard() {
         val leaderboardCategory: MutableList<LeaderboardApiModel> = mutableListOf()
+        // [Category1 Size, Category2 Size, Category3 Size]
         val listSizes: MutableList<Int> = mutableListOf()
 
         for (categoryId in 1..3) {
@@ -39,7 +40,9 @@ class LeaderboardRepository @Inject constructor(
     }
 
     // Getters
-    fun getLeaderboardData(categoryId: Int) = database.leaderboardDao().getAllLeaderboardDataCategory(categoryId)
+    fun getLeaderboardData(categoryId: Int) = database.leaderboardDao()
+        .getAllLeaderboardDataCategory(categoryId)
+        .filter { it.submitted == 1 }
 
     fun getTotalSubmittedGamesForUser(nickname: String): Int {
         return database.leaderboardDao().countTotalSubmittedGamesForUser(nickname)

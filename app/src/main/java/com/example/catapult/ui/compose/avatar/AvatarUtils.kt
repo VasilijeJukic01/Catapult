@@ -33,7 +33,8 @@ fun getAvatarResource(avatar: String): Int {
 
 fun copyImageToAppDir(context: Context, contentResolver: ContentResolver, uri: Uri, filename: String): Uri? {
     val inputStream: InputStream? = contentResolver.openInputStream(uri)
-    val file = File(context.filesDir, filename)
+    val uniqueFilename = "${System.currentTimeMillis()}_$filename"
+    val file = File(context.filesDir, uniqueFilename)
     val outputStream = FileOutputStream(file)
 
     inputStream?.use { input ->

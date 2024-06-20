@@ -9,6 +9,7 @@ import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.coroutines.DispatcherProvider
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.UIBreedImage
@@ -85,9 +86,10 @@ class LeftOrRightCatScreenTest {
             )
         )
         val repository: BreedRepository = mockk()
+        val audioManager: AudioManager = mockk()
         coEvery { repository.leftOrRightFetch() } returns mockQuestions
 
-        val viewModel = LeftOrRightViewModel(repository = repository, dispatcherProvider = DispatcherProvider())
+        val viewModel = LeftOrRightViewModel(repository = repository, dispatcherProvider = DispatcherProvider(), audioManager = audioManager)
         val initialState = mutableStateOf(viewModel.state.value.copy(totalCorrect = 0, currentQuestionNumber = 1))
 
         composeTestRule.setContent {

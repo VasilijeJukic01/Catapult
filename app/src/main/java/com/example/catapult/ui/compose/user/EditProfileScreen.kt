@@ -96,8 +96,8 @@ fun EditUserScreen(
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val context = LocalContext.current
-    val launcher =
-        rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
+    // READ_EXTERNAL_STORAGE Runtime Permission Needed
+    val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
             val copiedImageUri = uri?.let {
                 copyImageToAppDir(
                     context, context.contentResolver,

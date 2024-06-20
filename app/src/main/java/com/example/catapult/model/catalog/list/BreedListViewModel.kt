@@ -1,7 +1,9 @@
 package com.example.catapult.model.catalog.list
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview

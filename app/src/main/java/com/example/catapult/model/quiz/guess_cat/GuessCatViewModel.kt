@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.guess_cat
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.model.quiz.GuessCatQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GuessCatViewModel @Inject constructor (
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -69,6 +71,8 @@ class GuessCatViewModel @Inject constructor (
             is GuessTheCatUiEvent.SelectCatImage -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(GuessTheCatUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
@@ -96,6 +100,7 @@ class GuessCatViewModel @Inject constructor (
                 totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
             )
         }
+        audioManager.playGameEndSound()
     }
 
     // Fetch
@@ -124,5 +129,10 @@ class GuessCatViewModel @Inject constructor (
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
     }
 }

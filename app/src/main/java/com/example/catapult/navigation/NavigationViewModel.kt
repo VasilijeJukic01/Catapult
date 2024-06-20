@@ -2,6 +2,7 @@ package com.example.catapult.navigation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.datastore.UserStore
 import com.example.catapult.repository.BreedRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -16,7 +17,8 @@ import javax.inject.Inject
 @HiltViewModel
 class NavigationViewModel @Inject constructor(
     private val store: UserStore,
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ): ViewModel() {
 
     // State
@@ -37,6 +39,7 @@ class NavigationViewModel @Inject constructor(
                 repository.fetchAllBreeds()
             }
         }
+        audioManager.playThemeSong()
     }
 
 }

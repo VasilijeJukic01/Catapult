@@ -28,8 +28,7 @@ class BreedGalleryViewModel @Inject constructor (
     private val stateFlow = MutableStateFlow(BreedGalleryContract.BreedGalleryUiState())
     val state = stateFlow.asStateFlow()
 
-    private fun setState(reducer: BreedGalleryContract.BreedGalleryUiState.() -> BreedGalleryContract.BreedGalleryUiState) =
-        stateFlow.update(reducer)
+    private fun setState(reducer: BreedGalleryContract.BreedGalleryUiState.() -> BreedGalleryContract.BreedGalleryUiState) = stateFlow.update(reducer)
 
     init {
         fetchImages()
