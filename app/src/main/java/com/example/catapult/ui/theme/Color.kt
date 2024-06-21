@@ -12,12 +12,12 @@ val Pink40 = Color(0xFF7D5260)
 
 val Error = Color(0xA8FF003B)
 
-// My colors
 val cardColor = Color(0xFFE4B198)
-val topBarColor = Color(0xFFFFA174)
+val topBarColor = Color(0xFFE6E0F7)
 
-val leaderboardCol1 = Color(0xFFD4AF37)
-val leaderboardCol2 = Color(0xFF818181)
-val leaderboardCol3 = Color(0xFFA55926)
+
+val leaderboardCol1 = Color(0xFFFFBD1F)
+val leaderboardCol2 = Color(0xFFC0C0C0)
+val leaderboardCol3 = Color(0xFFCD7F32)
 val leaderboardCol4 = Color(0xFF4876BB)
 val leaderboardCol5 = Color(0xFF8363BD)

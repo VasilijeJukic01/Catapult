@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.guess_cat
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.model.quiz.GuessCatQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GuessCatViewModel @Inject constructor (
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -69,6 +71,8 @@ class GuessCatViewModel @Inject constructor (
             is GuessTheCatUiEvent.SelectCatImage -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(GuessTheCatUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
@@ -93,9 +97,11 @@ class GuessCatViewModel @Inject constructor (
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
+        audioManager.playGameEndSound()
     }
 
     // Fetch
@@ -103,7 +109,14 @@ class GuessCatViewModel @Inject constructor (
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val questions = repository.guessTheCatFetch()
-                val currentQuestion = questions.random()
+                var currentQuestion = questions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.breedAndImages[0].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[1].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[2].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[3].second)) {
+                    currentQuestion = questions.random()
+                }
 
                 val questionType = currentQuestion.questionType
 
@@ -116,13 +129,22 @@ class GuessCatViewModel @Inject constructor (
                 val correctAnswer = currentQuestion.correctAnswer
                 val catImages = currentQuestion.breedAndImages.map { it.second }
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                catImages.forEach { newUsedImages.add(it) }
+
                 setState { copy(
                     question = question,
                     catImages = catImages,
                     correctAnswer = correctAnswer,
-                    currentQuestionNumber = currentQuestionNumber + 1)
+                    currentQuestionNumber = currentQuestionNumber + 1,
+                    usedImages = newUsedImages)
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
     }
 }

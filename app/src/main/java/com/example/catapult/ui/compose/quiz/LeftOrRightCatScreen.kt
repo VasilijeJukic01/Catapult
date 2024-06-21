@@ -1,12 +1,15 @@
 package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -23,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -34,12 +38,19 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import com.example.catapult.ui.compose.ShowExitQuizDialog
 import com.example.catapult.model.quiz.left_or_right.*
+import com.example.catapult.ui.compose.SetScreenOrientation
 
 // Navigation
 fun NavGraphBuilder.leftOrRightScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val leftOrRightViewModel: LeftOrRightViewModel = hiltViewModel()
     val state by leftOrRightViewModel.state.collectAsState()
 
@@ -88,6 +99,8 @@ fun LeftOrRightContent(
     val incorrectColor = Color.Red
     val showDialog = remember { mutableStateOf(false) }
 
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+
     val orientation = LocalConfiguration.current.orientation
 
     ShowExitQuizDialog(showDialog, onBackClick)
@@ -118,11 +131,13 @@ fun LeftOrRightContent(
                 ) {
                     Text(
                         text = "Question ${state.currentQuestionNumber} of 20",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag("LeftOrRightCatScreen::TopAppBar::CurrentQuestionNumber"),
                     )
                     Text(
                         text = "Total Points: ${state.totalCorrect}",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.testTag("LeftOrRightCatScreen::TopAppBar::TotalCorrect"),
                     )
                     Text(
                         text = "Time Left: ${state.timeLeft / 60}:${state.timeLeft % 60}",
@@ -162,13 +177,14 @@ fun LeftOrRightContent(
                                 modifier = Modifier
                                     .size(170.dp)
                                     .clickable { onCatImageClick(index) },
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Image(
                                     painter = rememberAsyncImagePainter(catImage.url),
                                     contentDescription = "Cat Image",
                                     modifier = Modifier
-                                        .fillMaxSize(),
+                                        .fillMaxSize()
+                                        .testTag("LeftOrRightCatScreen::CatImage $index"),
                                     contentScale = ContentScale.Crop
                                 )
                             }
@@ -178,7 +194,8 @@ fun LeftOrRightContent(
                 Button(
                     onClick = onSkipClick,
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
-                    modifier = Modifier.padding(16.dp)
+                    modifier = Modifier
+                        .padding(16.dp)
                 ) {
                     Text("Skip Question")
 
@@ -219,7 +236,7 @@ fun LeftOrRightContent(
 
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { showDialog.value = true }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }

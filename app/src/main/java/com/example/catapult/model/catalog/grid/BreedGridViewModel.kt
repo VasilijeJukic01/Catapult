@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class BreedGridViewModel @Inject constructor (
     savedStateHandle: SavedStateHandle,
-    private val photoRepository: BreedRepository
+    private val repository: BreedRepository
 ) : ViewModel() {
 
     private val breedId = savedStateHandle.get<String>("breedId") ?: throw IllegalStateException("breedId required")
@@ -39,7 +39,7 @@ class BreedGridViewModel @Inject constructor (
             setState { copy(loading = true) }
             try {
                 val images = withContext(Dispatchers.IO) {
-                    photoRepository.allImagesForBreed(breedId = breedId)
+                    repository.allImagesForBreed(breedId = breedId)
                 }
                 setState { copy(images = images.map { it.asViewBreedImage() }) }
             } catch (error: Exception) {

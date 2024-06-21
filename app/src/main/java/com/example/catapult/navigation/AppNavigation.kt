@@ -39,11 +39,7 @@ fun AppNavigation() {
 
     NavHost(
         navController = navController,
-        startDestination = startDestination.value,
-     //   enterTransition = { slideInHorizontally {it } },
-      //  exitTransition = { scaleOut (targetScale = 0.75f) },
-       // popEnterTransition = { scaleIn(initialScale = 0.75f) },
-      //  popExitTransition = { slideOutHorizontally { it} },
+        startDestination = startDestination.value
     ) {
         composable(route = "loading") {
             Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {

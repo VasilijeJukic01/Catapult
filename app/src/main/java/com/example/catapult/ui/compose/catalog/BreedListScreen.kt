@@ -1,5 +1,9 @@
 package com.example.catapult.ui.compose.catalog
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,6 +11,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -37,7 +42,13 @@ import com.example.catapult.ui.theme.*
 fun NavGraphBuilder.breedsListScreen(
     route: String,
     navController: NavController,
-) = composable (route = route) {
+) = composable (
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val breedListViewModel = hiltViewModel<BreedListViewModel>()
     val state by breedListViewModel.state.collectAsState()
 
@@ -49,6 +60,9 @@ fun NavGraphBuilder.breedsListScreen(
         onClick = { breed ->
             navController.navigate(route = "breeds/${breed.id}")
         },
+        onBackClick = {
+            navController.popBackStack()
+        }
     )
 }
 
@@ -57,7 +71,8 @@ fun NavGraphBuilder.breedsListScreen(
 fun BreedListScreen(
     state : BreedListState,
     eventPublisher: (BreedListUiEvent) -> Unit,
-    onClick: (UIBreed) -> Unit
+    onClick: (UIBreed) -> Unit,
+    onBackClick: () -> Unit
 ) {
     val logo: Painter = painterResource(id = R.drawable.logo_vector)
     val keyboardController = LocalSoftwareKeyboardController.current
@@ -70,7 +85,8 @@ fun BreedListScreen(
                 state = state,
                 eventPublisher = eventPublisher,
                 keyboardController = keyboardController,
-                focusManager = focusManager
+                focusManager = focusManager,
+                onBackClick = onBackClick
             )
         },
         content = {
@@ -92,7 +108,8 @@ private fun CustomTopBar(
     state: BreedListState,
     eventPublisher: (BreedListUiEvent) -> Unit,
     keyboardController: SoftwareKeyboardController?,
-    focusManager: FocusManager
+    focusManager: FocusManager,
+    onBackClick: () -> Unit
 ) {
     val searchText = remember { mutableStateOf(state.filter) }
 
@@ -102,11 +119,16 @@ private fun CustomTopBar(
                 Text(text = "Catalog")
             },
             navigationIcon = {
+                IconButton(onClick = onBackClick) {
+                    Icon(Icons.Filled.ArrowBack, contentDescription = "Navigate back")
+                }
+            },
+            actions = {
                 Image(
                     painter = logo,
                     contentDescription = "App Logo",
                     modifier = Modifier
-                        .padding(start = 10.dp)
+                        .padding(end = 10.dp)
                         .size(48.dp)
                 )
             }
@@ -202,6 +224,7 @@ fun PreviewCatListScreen() {
             state = BreedListState(UIBreeds = DataSample),
             eventPublisher = {},
             onClick = {},
+            onBackClick = {}
         )
     }
 }

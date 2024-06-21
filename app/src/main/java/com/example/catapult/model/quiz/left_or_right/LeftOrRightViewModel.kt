@@ -3,6 +3,8 @@ package com.example.catapult.model.quiz.left_or_right
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
+import com.example.catapult.coroutines.DispatcherProvider
 import com.example.catapult.model.quiz.LeftOrRightQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -13,7 +15,6 @@ import kotlinx.coroutines.launch
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightState
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.withContext
@@ -21,7 +22,9 @@ import javax.inject.Inject
 
 @HiltViewModel
 class LeftOrRightViewModel @Inject constructor(
-    private val repository: BreedRepository
+    private val dispatcherProvider: DispatcherProvider,
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -74,6 +77,8 @@ class LeftOrRightViewModel @Inject constructor(
                         isCorrectAnswer = isCorrect
                     )
                 }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(LeftOrRightUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
@@ -98,17 +103,24 @@ class LeftOrRightViewModel @Inject constructor(
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
+        audioManager.playGameEndSound()
     }
 
     // Fetch
     private fun fetchLeftOrRightQuestions() {
         viewModelScope.launch {
-            withContext(Dispatchers.IO) {
+            withContext(dispatcherProvider.io()) {
                 val leftOrRightQuestions = repository.leftOrRightFetch()
-                val currentQuestion = leftOrRightQuestions.random()
+                var currentQuestion = leftOrRightQuestions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.firstBreedAndImage.second) ||
+                    state.value.usedImages.contains(currentQuestion.secondBreedAndImage.second)) {
+                    currentQuestion = leftOrRightQuestions.random()
+                }
 
                 val firstBreedAndImage = currentQuestion.firstBreedAndImage
                 val secondBreedAndImage = currentQuestion.secondBreedAndImage
@@ -120,16 +132,27 @@ class LeftOrRightViewModel @Inject constructor(
                     LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER -> "Which cat lives longer on average?"
                 }
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                newUsedImages.add(firstBreedAndImage.second)
+                newUsedImages.add(secondBreedAndImage.second)
+
                 setState {
                     copy(
                         question = question,
                         catImages = Pair(firstBreedAndImage.second, secondBreedAndImage.second),
                         correctAnswer = correctAnswer,
-                        currentQuestionNumber = currentQuestionNumber + 1
+                        currentQuestionNumber = currentQuestionNumber + 1,
+                        usedImages = newUsedImages
                     )
                 }
             }
         }
     }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
+    }
+
 }
 

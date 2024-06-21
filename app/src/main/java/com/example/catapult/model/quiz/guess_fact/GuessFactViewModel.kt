@@ -3,6 +3,7 @@ package com.example.catapult.model.quiz.guess_fact
 import android.os.CountDownTimer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.model.quiz.GuessFactQuestionType
 import com.example.catapult.repository.BreedRepository
 import kotlinx.coroutines.Dispatchers
@@ -21,7 +22,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class GuessFactViewModel @Inject constructor (
-    private val repository: BreedRepository
+    private val repository: BreedRepository,
+    private val audioManager: AudioManager
 ) : ViewModel() {
 
     // State
@@ -70,11 +72,13 @@ class GuessFactViewModel @Inject constructor (
             is GuessTheFactUiEvent.SelectFact -> {
                 val isCorrect = event.index == state.value.correctAnswer
                 setState { copy(totalCorrect = if (isCorrect) totalCorrect + 1 else totalCorrect, isCorrectAnswer = isCorrect) }
+                if (isCorrect) audioManager.playCorrectAnswerSound()
+                else audioManager.playIncorrectAnswerSound()
                 setEvent(GuessTheFactUiEvent.NextQuestion(isCorrect))
             }
             // Next Question
             is GuessTheFactUiEvent.NextQuestion -> {
-                if (state.value.currentQuestionNumber >= 3)
+                if (state.value.currentQuestionNumber >= 20)
                     endQuiz()
                 else {
                     fetchGuessTheFactQuestions()
@@ -96,16 +100,22 @@ class GuessFactViewModel @Inject constructor (
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
+        audioManager.playGameEndSound()
     }
 
     private fun fetchGuessTheFactQuestions() {
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val questions = repository.guessTheFactFetch()
-                val currentQuestion = questions.random()
+                var currentQuestion = questions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.breedAndImage.second)){
+                    currentQuestion = questions.random()
+                }
 
                 val questionType = currentQuestion.questionType
                 val question = when (questionType) {
@@ -117,17 +127,26 @@ class GuessFactViewModel @Inject constructor (
                 val catImage = currentQuestion.breedAndImage.second
                 val correctAnswer = currentQuestion.correctAnswer
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                newUsedImages.add(catImage)
+
                 setState {
                     copy(
                         question = question,
                         options = currentQuestion.options,
                         catImage = catImage,
                         correctAnswer = correctAnswer,
-                        currentQuestionNumber = currentQuestionNumber + 1
+                        currentQuestionNumber = currentQuestionNumber + 1,
+                        usedImages = newUsedImages
                     )
                 }
             }
         }
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        audioManager.release()
     }
 
 }

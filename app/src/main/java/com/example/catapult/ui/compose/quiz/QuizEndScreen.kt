@@ -1,5 +1,9 @@
 package com.example.catapult.ui.compose.quiz
 
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,7 +29,13 @@ import com.example.catapult.model.quiz.end_quiz.EndQuizContract.*
 fun NavGraphBuilder.quizEndScreen(
     route: String,
     navController: NavController,
-) = composable(route = "$route/{totalPoints}/{category}") { backStackEntry ->
+) = composable(
+    route = "$route/{totalPoints}/{category}",
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) { backStackEntry ->
     val endQuizViewModel = hiltViewModel<EndQuizViewModel>()
 
     val totalPoints = backStackEntry.arguments?.getString("totalPoints")?.toFloat() ?: 0.0f

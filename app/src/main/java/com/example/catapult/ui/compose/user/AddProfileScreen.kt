@@ -1,5 +1,10 @@
 package com.example.catapult.ui.compose.user
 
+import android.content.pm.ActivityInfo
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -24,13 +29,21 @@ import androidx.compose.ui.res.painterResource
 import com.example.catapult.R
 import com.example.catapult.model.user.create.AddUserContract.AddUserUiEvent
 import com.example.catapult.model.user.create.AddUserViewModel
+import com.example.catapult.ui.compose.SetScreenOrientation
 import com.example.catapult.ui.compose.transparentTextField
+import com.example.catapult.ui.theme.topBarColor
 
 // Navigation
 fun NavGraphBuilder.addUserScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val addUserViewModel = hiltViewModel<AddUserViewModel>()
 
     AddProfileScreen(
@@ -47,6 +60,8 @@ fun AddProfileScreen(
     onBackClick: () -> Unit = {},
     onSubmitClick: () -> Unit = {},
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val image = painterResource(id = R.drawable.background2)
 
     var firstName by remember { mutableStateOf("") }
@@ -74,13 +89,21 @@ fun AddProfileScreen(
         Column {
             // TopAppBar
             TopAppBar(
-                title = { Text(text = "Back") },
+                title = {
+                    Text(
+                        text = "Back",
+                        color = Color.Black
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back",tint = Color.Black)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
             // Surface

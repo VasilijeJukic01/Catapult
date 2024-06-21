@@ -1,14 +1,19 @@
 package com.example.catapult.ui.compose.user
 
 import android.annotation.SuppressLint
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
@@ -16,7 +21,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -45,7 +49,11 @@ fun NavGraphBuilder.profileScreen(
     navController: NavController
 ) = composable(
     route = route,
-    arguments = arguments
+    arguments = arguments,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
 ) { backStackEntry ->
     val profileViewModel = hiltViewModel<ProfileViewModel>(backStackEntry)
     val state by profileViewModel.state.collectAsState()
@@ -63,41 +71,49 @@ fun ProfileScreen(
     state: ProfileContract.ProfileState,
     onBackClick: () -> Unit
 ) {
-    Scaffold(
-        // Top Bar
-        topBar = {
+    Surface(
+        modifier = Modifier.fillMaxSize()
+    ) {
+        Column {
+            // Top Bar
             TopAppBar(
-                title = { Text("Profile") },
+                title = {
+                    Text(
+                        text = "Back",
+                        color = MaterialTheme.colorScheme.onSecondary
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
                     }
-                }
+                },
+                modifier = Modifier.fillMaxWidth(),
             )
-        }
-    ) {
-        // Surface
-        Surface(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = 120.dp),
-            shape = RoundedCornerShape(8.dp),
-            color = MaterialTheme.colorScheme.background
-        ) {
-            Column(modifier = Modifier
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState())) {
-                UserInfo(state.currentUser)
-                Spacer(modifier = Modifier.height(16.dp))
-                QuizHistory(state)
-                Spacer(modifier = Modifier.height(16.dp))
-                BestResults(state)
-                Spacer(modifier = Modifier.height(16.dp))
-                BestGlobalPositions(state)
+
+            Box {
+                Column(
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .verticalScroll(rememberScrollState())
+                ) {
+                    UserInfo(state.currentUser)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    QuizHistory(state)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    BestResults(state)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    BestGlobalPositions(state)
+                }
             }
         }
+        }
     }
-}
+
 
 @Composable
 fun UserInfo(user: UserData) {
@@ -123,7 +139,7 @@ fun QuizHistory(state: ProfileContract.ProfileState) {
             results.forEach { result ->
                 Row(modifier = Modifier.padding(bottom = 4.dp)) {
                     Text(
-                        "Pos: ${result.position}: ${result.result} points",
+                        "Pos: ${result.position}: ${String.format("%.2f",result.result)} points",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )

@@ -1,8 +1,13 @@
 package com.example.catapult.ui.compose.user
 
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.runtime.Composable
@@ -37,9 +42,11 @@ import com.example.catapult.R
 import com.example.catapult.model.user.edit.EditUserContract
 import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent
 import com.example.catapult.model.user.edit.EditUserViewModel
+import com.example.catapult.ui.compose.SetScreenOrientation
 import com.example.catapult.ui.compose.avatar.copyImageToAppDir
 import com.example.catapult.ui.compose.avatar.getAvatarResource
 import com.example.catapult.ui.compose.transparentTextField
+import com.example.catapult.ui.theme.topBarColor
 
 // Navigation
 fun NavGraphBuilder.editUserScreen(
@@ -48,8 +55,12 @@ fun NavGraphBuilder.editUserScreen(
     navController: NavController,
 ) = composable(
     route = route,
-    arguments = arguments
-) {backStackEntry ->
+    arguments = arguments,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) { backStackEntry ->
     val editUserViewModel = hiltViewModel<EditUserViewModel>(backStackEntry)
     val state by editUserViewModel.state.collectAsState()
 
@@ -69,6 +80,8 @@ fun EditUserScreen(
     onBackClick: () -> Unit = {},
     onSubmitClick: () -> Unit = {},
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val image = painterResource(id = R.drawable.background2)
 
     var firstName by remember { mutableStateOf(state.user.firstName) }
@@ -87,15 +100,18 @@ fun EditUserScreen(
     var selectedImageUri by remember { mutableStateOf<Uri?>(null) }
 
     val context = LocalContext.current
+    // READ_EXTERNAL_STORAGE Runtime Permission Needed
     val launcher = rememberLauncherForActivityResult(contract = ActivityResultContracts.GetContent()) { uri: Uri? ->
-        val copiedImageUri = uri?.let {
-            copyImageToAppDir(context, context.contentResolver,
-                it, "selectedImage")
+            val copiedImageUri = uri?.let {
+                copyImageToAppDir(
+                    context, context.contentResolver,
+                    it, "selectedImage"
+                )
+            }
+            if (copiedImageUri != null) {
+                selectedImageUri = copiedImageUri
+            }
         }
-        if (copiedImageUri != null) {
-            selectedImageUri = copiedImageUri
-        }
-    }
 
     // Regex
     val emailPattern = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$".toRegex()
@@ -117,13 +133,21 @@ fun EditUserScreen(
         Column {
             // TopAppBar
             TopAppBar(
-                title = { Text(text = "Back") },
+                title = {
+                    Text(
+                        text = "Back",
+                        color = Color.Black
+                    )
+                },
                 navigationIcon = {
                     IconButton(onClick = onBackClick) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
+                        Icon(Icons.Default.ArrowBack, contentDescription = "Back",tint = Color.Black)
                     }
                 },
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
+                colors = TopAppBarDefaults.topAppBarColors(
+                    containerColor = topBarColor,
+                )
             )
             Spacer(modifier = Modifier.height(16.dp))
             // Form Surface
@@ -163,8 +187,14 @@ fun EditUserScreen(
                             contentScale = ContentScale.Crop
                         )
                         Spacer(modifier = Modifier.width(16.dp))
-                        Button(onClick = { launcher.launch("image/*") }) {
-                            Text("Choose Photo")
+                        Button(
+                            onClick = { launcher.launch("image/*") },
+                            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.inversePrimary)
+                        ) {
+                            Text(
+                                text = "Choose Photo",
+                                color = Color.White
+                            )
                         }
                     }
                     Spacer(modifier = Modifier.height(24.dp))
@@ -172,10 +202,12 @@ fun EditUserScreen(
                     TextField(
                         value = firstName,
                         onValueChange = { firstName = it },
-                        label = { Text(
-                            text = "First Name",
-                            color = Color.Black
-                        ) },
+                        label = {
+                            Text(
+                                text = "First Name",
+                                color = Color.Black
+                            )
+                        },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         colors = transparentTextField()
@@ -185,10 +217,12 @@ fun EditUserScreen(
                     TextField(
                         value = lastName,
                         onValueChange = { lastName = it },
-                        label = { Text(
-                            text = "Last Name",
-                            color = Color.Black
-                        ) },
+                        label = {
+                            Text(
+                                text = "Last Name",
+                                color = Color.Black
+                            )
+                        },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         colors = transparentTextField()
@@ -198,10 +232,12 @@ fun EditUserScreen(
                     TextField(
                         value = nickname,
                         onValueChange = { nickname = it },
-                        label = { Text(
-                            text = "Nickname",
-                            color = Color.Black
-                        ) },
+                        label = {
+                            Text(
+                                text = "Nickname",
+                                color = Color.Black
+                            )
+                        },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         isError = isNicknameError,
@@ -220,10 +256,12 @@ fun EditUserScreen(
                     TextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text(
-                            text = "Email",
-                            color = Color.Black
-                        ) },
+                        label = {
+                            Text(
+                                text = "Email",
+                                color = Color.Black
+                            )
+                        },
                         singleLine = true,
                         modifier = Modifier.fillMaxWidth(),
                         isError = isEmailError,
@@ -241,7 +279,16 @@ fun EditUserScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
-                                eventPublisher(EditUser(selectedImageUri.toString(), firstName, lastName, nickname, email))
+                                val avatar = if (selectedImageUri != null) selectedImageUri.toString() else state.user.avatar
+                                eventPublisher(
+                                    EditUser(
+                                        avatar,
+                                        firstName,
+                                        lastName,
+                                        nickname,
+                                        email
+                                    )
+                                )
                                 onSubmitClick()
                             }
                         },

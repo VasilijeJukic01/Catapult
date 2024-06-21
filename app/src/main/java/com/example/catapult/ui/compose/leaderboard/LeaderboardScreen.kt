@@ -1,5 +1,10 @@
 package com.example.catapult.ui.compose.leaderboard
 
+import android.content.pm.ActivityInfo
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -28,12 +33,22 @@ import com.example.catapult.model.leaderboard.LeaderboardViewModel
 import com.example.catapult.model.leaderboard.LeaderboardContract.*
 import com.example.catapult.ui.theme.*
 import androidx.compose.foundation.layout.*
+import androidx.compose.material3.SuggestionChipDefaults
+import androidx.compose.material3.Surface
+import androidx.compose.ui.text.style.TextAlign
+import com.example.catapult.ui.compose.SetScreenOrientation
 
 // Navigation
 fun NavGraphBuilder.leaderboardScreen(
     route: String,
     navController: NavController
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val viewModel = hiltViewModel<LeaderboardViewModel>()
     val state by viewModel.state.collectAsState()
 
@@ -51,135 +66,168 @@ fun LeaderboardScreen(
     eventPublisher: (LeaderboardUiEvent) -> Unit,
     onBackClick: () -> Unit
 ) {
-    Column(
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+
+
+    Surface(
         modifier = Modifier.fillMaxSize()
     ) {
         // Top Bar
-        TopAppBar(
-            navigationIcon = {
-                IconButton(onClick = onBackClick) {
-                    Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
-                }
-            },
-            title = { Text("Leaderboard") }
-        )
-        Spacer(modifier = Modifier.height(12.dp))
-        Column (
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp)
-        ) {
-            // Text
-            Column (
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-               Text(
-                    text = "Leaderboard",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(8.dp),
-                )
-            }
-            // Table Header
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly
-            ) {
-                listOf("Category 1", "Category 2", "Category 3").forEachIndexed { index, category ->
-                    SuggestionChip(
-                        label = {
-                            Text(
-                                text = category,
-                                color = MaterialTheme.colorScheme.onPrimary,
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-                        },
-                        onClick = { eventPublisher(LeaderboardUiEvent.SelectCategory(index + 1)) }
+        Column {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Back",
+                        color = MaterialTheme.colorScheme.onSecondary
                     )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            // Items
-            LazyColumn(
+                },
+                navigationIcon = {
+                    IconButton(onClick = onBackClick) {
+                        Icon(
+                            Icons.Default.ArrowBack,
+                            contentDescription = "Back",
+                            tint = MaterialTheme.colorScheme.onSecondary
+                        )
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+            )
+
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(top = 8.dp)
+                    .padding(16.dp),
             ) {
-                item {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically,
-                    ) {
-                        Text(
-                            text = "Position",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = "Nickname",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = "Result",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
-                        )
-                        Text(
-                            text = "Total Games",
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = Color.Black
+                // Text
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Leaderboard",
+                        style = MaterialTheme.typography.titleLarge,
+                        color = MaterialTheme.colorScheme.onSecondary,
+                        modifier = Modifier.padding(bottom = 16.dp),
+                    )
+                }
+                // Table Header
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    listOf(
+                        "Category 1",
+                        "Category 2",
+                        "Category 3"
+                    ).forEachIndexed { index, category ->
+                        SuggestionChip(
+                            label = {
+                                Text(
+                                    text = category,
+                                    color = MaterialTheme.colorScheme.onSecondary,
+                                    style = MaterialTheme.typography.bodyMedium
+                                )
+                            },
+                            colors = SuggestionChipDefaults.suggestionChipColors(
+                                containerColor = Color.Transparent
+                            ),
+                            onClick = { eventPublisher(LeaderboardUiEvent.SelectCategory(index + 1)) }
                         )
                     }
                 }
-                items(state.leaderboard) { item ->
-                    val color = when (item.position) {
-                        1 -> leaderboardCol1
-                        2 -> leaderboardCol2
-                        3 -> leaderboardCol3
-                        in 4..10 -> leaderboardCol4
-                        else -> leaderboardCol5
-                    }
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = color
-                        ),
-                    ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                // Items
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(top = 8.dp)
+                ) {
+                    item {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
-                                text = item.position.toString(),
+                                text = "Pos",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier.weight(1f)
                             )
                             Text(
-                                text = item.nickname,
+                                text = "Nickname",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier.weight(2f)
                             )
                             Text(
-                                text = item.result.toString(),
+                                text = "Result",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier.weight(1f)
                             )
                             Text(
-                                text = item.totalGamesSubmitted.toString(),
+                                text = "Games",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onBackground
+                                color = MaterialTheme.colorScheme.onSecondary,
+                                modifier = Modifier.weight(1f),
+                                textAlign = TextAlign.End,
                             )
+                        }
+                    }
+                    items(state.leaderboard) { item ->
+                        val color = when (item.position) {
+                            1 -> leaderboardCol1
+                            2 -> leaderboardCol2
+                            3 -> leaderboardCol3
+                            in 4..10 -> leaderboardCol4
+                            else -> leaderboardCol5
+                        }
+                        Card(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 4.dp),
+                            colors = CardDefaults.cardColors(
+                                containerColor = color
+                            ),
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = item.position.toString(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = item.nickname,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(2f)
+                                )
+                                Text(
+                                    text = String.format("%.2f", item.result),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f)
+                                )
+                                Text(
+                                    text = item.totalGamesSubmitted.toString(),
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = Color.Black,
+                                    modifier = Modifier.weight(1f),
+                                    textAlign = TextAlign.End,
+                                )
+                            }
                         }
                     }
                 }

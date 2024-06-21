@@ -8,6 +8,7 @@ import com.example.catapult.navigation.AppNavigation
 import com.example.catapult.ui.theme.CatalogTheme
 import dagger.hilt.android.AndroidEntryPoint
 
+// Entry point for injection
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 

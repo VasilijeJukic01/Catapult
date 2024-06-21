@@ -1,12 +1,15 @@
 package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -50,12 +53,19 @@ import com.example.catapult.model.quiz.guess_cat.GuessCatContract.GuessTheCatUiE
 import com.example.catapult.ui.compose.ShowExitQuizDialog
 import com.example.catapult.model.quiz.guess_cat.*
 import androidx.compose.foundation.layout.*
+import com.example.catapult.ui.compose.SetScreenOrientation
 
 // Navigation
 fun NavGraphBuilder.guessTheCatScreen(
     route: String,
     navController: NavController,
-) = composable(route = route) {
+) = composable(
+    route = route,
+    enterTransition = { slideInHorizontally { it } },
+    exitTransition = { scaleOut (targetScale = 0.75f) },
+    popEnterTransition = { scaleIn(initialScale = 0.75f) },
+    popExitTransition = { slideOutHorizontally { it } },
+) {
     val guessCatViewModel = hiltViewModel<GuessCatViewModel>()
     val state by guessCatViewModel.state.collectAsState()
 
@@ -89,6 +99,8 @@ fun GuessTheCatScreen(
     val correctColor = Color.Green
     val incorrectColor = Color.Red
     val showDialog = remember { mutableStateOf(false) }
+
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
 
     val orientation = LocalConfiguration.current.orientation
 

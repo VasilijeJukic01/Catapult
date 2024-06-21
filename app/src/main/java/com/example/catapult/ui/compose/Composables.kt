@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose
 
+import android.app.Activity
 import androidx.compose.foundation.clickable
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -37,6 +38,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.MutableState
+import androidx.compose.ui.platform.LocalContext
 
 // BredCard
 @Composable
@@ -235,6 +237,13 @@ fun transparentTextField(isError: Boolean = false): TextFieldColors {
         unfocusedContainerColor = Color.Transparent,
         errorContainerColor = Color.Transparent
     )
+}
+
+@Composable
+fun SetScreenOrientation(orientation: Int) {
+    val context = LocalContext.current
+    val activity = context as? Activity
+    activity?.requestedOrientation = orientation
 }
 
 // Preview

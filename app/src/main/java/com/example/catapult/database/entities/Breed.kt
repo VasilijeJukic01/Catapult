@@ -6,22 +6,22 @@ import androidx.room.PrimaryKey
 @Entity
 data class Breed (
     @PrimaryKey
-    val id: String,
-    val name: String,
-    val altNames: String,
-    val description: String,
-    val temperament: String,
-    val origin: String,
-    val weight: String,
-    val lifeSpan: String,
-    val adaptability: Int,
-    val affectionLevel: Int,
-    val energyLevel: Int,
-    val intelligence: Int,
-    val strangerFriendly: Int,
-    val rare: Int,
-    val wikipediaUrl: String,
-    val imageUrl: String
+    val id: String = "",
+    val name: String = "",
+    val altNames: String = "",
+    val description: String = "",
+    val temperament: String = "",
+    val origin: String = "",
+    val weight: String = "",
+    val lifeSpan: String = "",
+    val adaptability: Int = 1,
+    val affectionLevel: Int = 1,
+    val energyLevel: Int = 1,
+    val intelligence: Int = 1,
+    val strangerFriendly: Int = 1,
+    val rare: Int = 1,
+    val wikipediaUrl: String = "",
+    val imageUrl: String = ""
 ) {
     init {
         require(adaptability in 1..5) { "Adaptability must be between 1 and 5" }

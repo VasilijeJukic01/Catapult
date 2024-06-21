@@ -38,6 +38,7 @@ class LeaderboardViewModel @Inject constructor(
     init {
         handleEvents()
         fetchLeaderboardData()
+        viewModelScope.launch { eventsFlow.emit(LeaderboardUiEvent.SelectCategory(1)) }
     }
 
     // Events

@@ -11,9 +11,9 @@ enum class GuessCatQuestionType {
 
 data class GuessCatQuestion(
     val questionType: GuessCatQuestionType,
-    val breedAndImages: List<Pair<UIBreed, UIBreedImage>>,
+    val breedAndImages: List<Pair<UIBreed, UIBreedImage>> = emptyList(),
     val temperament: String = "",
-    val correctAnswer: Int
+    val correctAnswer: Int = -1
 )
 
 // Quiz II
@@ -25,9 +25,9 @@ enum class GuessFactQuestionType {
 
 data class GuessFactQuestion(
     val questionType: GuessFactQuestionType,
-    val breedAndImage: Pair<UIBreed, UIBreedImage>,
-    val options: List<String>,
-    val correctAnswer: Int
+    val breedAndImage: Pair<UIBreed, UIBreedImage> = Pair(UIBreed(), UIBreedImage()),
+    val options: List<String> = emptyList(),
+    val correctAnswer: Int = -1
 )
 
 // Quiz III
@@ -38,7 +38,7 @@ enum class LeftOrRightQuestionType {
 
 data class LeftOrRightQuestion(
     val questionType: LeftOrRightQuestionType,
-    val firstBreedAndImage: Pair<UIBreed, UIBreedImage>,
-    val secondBreedAndImage: Pair<UIBreed, UIBreedImage>,
-    val correctAnswer: Int
+    val firstBreedAndImage: Pair<UIBreed, UIBreedImage> = Pair(UIBreed(), UIBreedImage()),
+    val secondBreedAndImage: Pair<UIBreed, UIBreedImage> = Pair(UIBreed(), UIBreedImage()),
+    val correctAnswer: Int = -1
 )

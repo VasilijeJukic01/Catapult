@@ -14,7 +14,8 @@ interface GuessFactContract {
         val isCorrectAnswer: Boolean? = null,
         val timeLeft: Long = 0L,
         val quizEnded: Boolean = false,
-        val totalPoints: Float = 0f
+        val totalPoints: Float = 0f,
+        val usedImages: MutableSet<UIBreedImage> = mutableSetOf()
     )
 
     sealed class GuessTheFactUiEvent{
