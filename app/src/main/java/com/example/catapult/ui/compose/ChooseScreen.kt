@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -41,6 +42,10 @@ fun NavGraphBuilder.chooseScreen(
 fun ChooseScreen(navController: NavController) {
     val drawerState: DrawerState = rememberDrawerState(DrawerValue.Closed)
     val scope = rememberCoroutineScope()
+
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
 
     ModalNavigationDrawer(
         drawerState = drawerState,

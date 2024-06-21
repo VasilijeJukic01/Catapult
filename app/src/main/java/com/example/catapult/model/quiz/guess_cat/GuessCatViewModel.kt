@@ -97,7 +97,8 @@ class GuessCatViewModel @Inject constructor (
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
         audioManager.playGameEndSound()
@@ -108,7 +109,14 @@ class GuessCatViewModel @Inject constructor (
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val questions = repository.guessTheCatFetch()
-                val currentQuestion = questions.random()
+                var currentQuestion = questions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.breedAndImages[0].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[1].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[2].second) ||
+                    state.value.usedImages.contains(currentQuestion.breedAndImages[3].second)) {
+                    currentQuestion = questions.random()
+                }
 
                 val questionType = currentQuestion.questionType
 
@@ -121,11 +129,15 @@ class GuessCatViewModel @Inject constructor (
                 val correctAnswer = currentQuestion.correctAnswer
                 val catImages = currentQuestion.breedAndImages.map { it.second }
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                catImages.forEach { newUsedImages.add(it) }
+
                 setState { copy(
                     question = question,
                     catImages = catImages,
                     correctAnswer = correctAnswer,
-                    currentQuestionNumber = currentQuestionNumber + 1)
+                    currentQuestionNumber = currentQuestionNumber + 1,
+                    usedImages = newUsedImages)
                 }
             }
         }

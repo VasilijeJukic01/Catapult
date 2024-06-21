@@ -2,6 +2,7 @@ package com.example.catapult
 
 import android.os.Looper
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.catapult.audio.AudioManager
 import com.example.catapult.coroutines.DispatcherProvider
 import com.example.catapult.model.catalog.UIBreed
 import com.example.catapult.model.catalog.UIBreedImage
@@ -34,6 +35,7 @@ class LeftOrRightViewModelTest {
 
     private lateinit var dispatcherProvider: DispatcherProvider
     private lateinit var repository: BreedRepository
+    private lateinit var audioManager: AudioManager
     private lateinit var viewModel: LeftOrRightViewModel
 
     // Initialize
@@ -44,7 +46,8 @@ class LeftOrRightViewModelTest {
         }
         dispatcherProvider = coroutineTestRule.dispatcherProvider
         repository = mockk(relaxed = true)
-        viewModel = LeftOrRightViewModel(dispatcherProvider, repository)
+        audioManager = mockk(relaxed = true)
+        viewModel = LeftOrRightViewModel(dispatcherProvider, repository, audioManager)
     }
 
     @Test

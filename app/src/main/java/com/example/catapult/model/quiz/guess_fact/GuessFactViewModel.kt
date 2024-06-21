@@ -100,7 +100,8 @@ class GuessFactViewModel @Inject constructor (
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
         audioManager.playGameEndSound()
@@ -110,7 +111,11 @@ class GuessFactViewModel @Inject constructor (
         viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val questions = repository.guessTheFactFetch()
-                val currentQuestion = questions.random()
+                var currentQuestion = questions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.breedAndImage.second)){
+                    currentQuestion = questions.random()
+                }
 
                 val questionType = currentQuestion.questionType
                 val question = when (questionType) {
@@ -122,13 +127,17 @@ class GuessFactViewModel @Inject constructor (
                 val catImage = currentQuestion.breedAndImage.second
                 val correctAnswer = currentQuestion.correctAnswer
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                newUsedImages.add(catImage)
+
                 setState {
                     copy(
                         question = question,
                         options = currentQuestion.options,
                         catImage = catImage,
                         correctAnswer = correctAnswer,
-                        currentQuestionNumber = currentQuestionNumber + 1
+                        currentQuestionNumber = currentQuestionNumber + 1,
+                        usedImages = newUsedImages
                     )
                 }
             }

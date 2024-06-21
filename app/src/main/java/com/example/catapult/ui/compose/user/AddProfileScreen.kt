@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose.user
 
+import android.content.pm.ActivityInfo
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
@@ -28,6 +29,7 @@ import androidx.compose.ui.res.painterResource
 import com.example.catapult.R
 import com.example.catapult.model.user.create.AddUserContract.AddUserUiEvent
 import com.example.catapult.model.user.create.AddUserViewModel
+import com.example.catapult.ui.compose.SetScreenOrientation
 import com.example.catapult.ui.compose.transparentTextField
 import com.example.catapult.ui.theme.topBarColor
 
@@ -58,6 +60,8 @@ fun AddProfileScreen(
     onBackClick: () -> Unit = {},
     onSubmitClick: () -> Unit = {},
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val image = painterResource(id = R.drawable.background2)
 
     var firstName by remember { mutableStateOf("") }

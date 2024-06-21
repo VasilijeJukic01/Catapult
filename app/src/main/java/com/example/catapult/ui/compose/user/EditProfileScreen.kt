@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose.user
 
+import android.content.pm.ActivityInfo
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -41,6 +42,7 @@ import com.example.catapult.R
 import com.example.catapult.model.user.edit.EditUserContract
 import com.example.catapult.model.user.edit.EditUserContract.EditUserUiEvent
 import com.example.catapult.model.user.edit.EditUserViewModel
+import com.example.catapult.ui.compose.SetScreenOrientation
 import com.example.catapult.ui.compose.avatar.copyImageToAppDir
 import com.example.catapult.ui.compose.avatar.getAvatarResource
 import com.example.catapult.ui.compose.transparentTextField
@@ -78,6 +80,8 @@ fun EditUserScreen(
     onBackClick: () -> Unit = {},
     onSubmitClick: () -> Unit = {},
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val image = painterResource(id = R.drawable.background2)
 
     var firstName by remember { mutableStateOf(state.user.firstName) }
@@ -275,9 +279,10 @@ fun EditUserScreen(
                     Button(
                         onClick = {
                             if (!isEmailError && !isNicknameError) {
+                                val avatar = if (selectedImageUri != null) selectedImageUri.toString() else state.user.avatar
                                 eventPublisher(
                                     EditUser(
-                                        selectedImageUri.toString(),
+                                        avatar,
                                         firstName,
                                         lastName,
                                         nickname,

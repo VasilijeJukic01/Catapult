@@ -139,7 +139,7 @@ fun QuizHistory(state: ProfileContract.ProfileState) {
             results.forEach { result ->
                 Row(modifier = Modifier.padding(bottom = 4.dp)) {
                     Text(
-                        "Pos: ${result.position}: ${result.result} points",
+                        "Pos: ${result.position}: ${String.format("%.2f",result.result)} points",
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.weight(1f)
                     )

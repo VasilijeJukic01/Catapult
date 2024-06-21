@@ -1,6 +1,7 @@
 package com.example.catapult.ui.compose.quiz
 
 import android.annotation.SuppressLint
+import android.content.pm.ActivityInfo
 import android.content.res.Configuration
 import androidx.activity.compose.BackHandler
 import androidx.compose.animation.AnimatedContent
@@ -37,6 +38,7 @@ import coil.compose.rememberAsyncImagePainter
 import com.example.catapult.model.quiz.left_or_right.LeftOrRightContract.LeftOrRightUiEvent
 import com.example.catapult.ui.compose.ShowExitQuizDialog
 import com.example.catapult.model.quiz.left_or_right.*
+import com.example.catapult.ui.compose.SetScreenOrientation
 
 // Navigation
 fun NavGraphBuilder.leftOrRightScreen(
@@ -96,6 +98,8 @@ fun LeftOrRightContent(
     val correctColor = Color.Green
     val incorrectColor = Color.Red
     val showDialog = remember { mutableStateOf(false) }
+
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
 
     val orientation = LocalConfiguration.current.orientation
 
@@ -232,7 +236,7 @@ fun LeftOrRightContent(
 
                     },
                     navigationIcon = {
-                        IconButton(onClick = onBackClick) {
+                        IconButton(onClick = { showDialog.value = true }) {
                             Icon(Icons.Filled.ArrowBack, contentDescription = "Back")
                         }
                     }

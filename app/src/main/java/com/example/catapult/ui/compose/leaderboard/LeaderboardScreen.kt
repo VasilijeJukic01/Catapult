@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose.leaderboard
 
+import android.content.pm.ActivityInfo
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInHorizontally
@@ -35,6 +36,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.material3.SuggestionChipDefaults
 import androidx.compose.material3.Surface
 import androidx.compose.ui.text.style.TextAlign
+import com.example.catapult.ui.compose.SetScreenOrientation
 
 // Navigation
 fun NavGraphBuilder.leaderboardScreen(
@@ -64,6 +66,9 @@ fun LeaderboardScreen(
     eventPublisher: (LeaderboardUiEvent) -> Unit,
     onBackClick: () -> Unit
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED)
+
+
     Surface(
         modifier = Modifier.fillMaxSize()
     ) {

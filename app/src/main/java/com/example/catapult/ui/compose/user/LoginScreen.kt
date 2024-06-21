@@ -1,5 +1,6 @@
 package com.example.catapult.ui.compose.user
 
+import android.content.pm.ActivityInfo
 import androidx.compose.foundation.Image
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -23,6 +24,7 @@ import com.example.catapult.model.user.login.LoginContract.LoginUiEvent
 import com.example.catapult.model.user.login.LoginContract.LoginUiEvent.OnLoginClick
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
+import com.example.catapult.ui.compose.SetScreenOrientation
 import com.example.catapult.ui.compose.transparentTextField
 
 // Navigation
@@ -44,6 +46,8 @@ fun NavGraphBuilder.loginScreen(
 fun LoginScreen(
     eventPublisher: (LoginUiEvent) -> Unit
 ) {
+    SetScreenOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT)
+
     val image = painterResource(id = R.drawable.background)
 
     var firstName by remember { mutableStateOf("") }

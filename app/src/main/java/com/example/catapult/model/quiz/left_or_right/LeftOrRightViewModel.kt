@@ -103,7 +103,8 @@ class LeftOrRightViewModel @Inject constructor(
         setState {
             copy(
                 quizEnded = true,
-                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f)
+                totalPoints = totalPoints.toFloat().coerceAtMost(maximumValue = 100.00f),
+                usedImages = mutableSetOf()
             )
         }
         audioManager.playGameEndSound()
@@ -114,7 +115,12 @@ class LeftOrRightViewModel @Inject constructor(
         viewModelScope.launch {
             withContext(dispatcherProvider.io()) {
                 val leftOrRightQuestions = repository.leftOrRightFetch()
-                val currentQuestion = leftOrRightQuestions.random()
+                var currentQuestion = leftOrRightQuestions.random()
+
+                while (state.value.usedImages.contains(currentQuestion.firstBreedAndImage.second) ||
+                    state.value.usedImages.contains(currentQuestion.secondBreedAndImage.second)) {
+                    currentQuestion = leftOrRightQuestions.random()
+                }
 
                 val firstBreedAndImage = currentQuestion.firstBreedAndImage
                 val secondBreedAndImage = currentQuestion.secondBreedAndImage
@@ -126,12 +132,17 @@ class LeftOrRightViewModel @Inject constructor(
                     LeftOrRightQuestionType.WHICH_CAT_LIVES_LONGER -> "Which cat lives longer on average?"
                 }
 
+                val newUsedImages = state.value.usedImages.toMutableSet()
+                newUsedImages.add(firstBreedAndImage.second)
+                newUsedImages.add(secondBreedAndImage.second)
+
                 setState {
                     copy(
                         question = question,
                         catImages = Pair(firstBreedAndImage.second, secondBreedAndImage.second),
                         correctAnswer = correctAnswer,
-                        currentQuestionNumber = currentQuestionNumber + 1
+                        currentQuestionNumber = currentQuestionNumber + 1,
+                        usedImages = newUsedImages
                     )
                 }
             }
